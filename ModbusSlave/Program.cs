@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ModbusSlave.Interfaces;
+using ModbusSlave.Services;
+using System;
 using System.Windows.Forms;
 
 namespace ModbusSlave
@@ -16,7 +15,23 @@ namespace ModbusSlave
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+
+            // Modbus Tcp 연결 클래스 인스턴스 생성
+            IModbusConnection modbusConnection = new ModbusTcpConnection();
+
+            // ContextMenuService를 먼저 생성
+            IContextMenuService contextMenuService = new ContextMenuService();
+
+            // DataViewService 생성
+            IDataViewService dataViewService = new DataViewService((ContextMenuService)contextMenuService);
+
+            // DataViewService가 생성된 이후, ContextMenuService에 설정
+            ((ContextMenuService)contextMenuService).SetDataViewService(dataViewService);
+
+            // Form1 생성 시 의존성 주입
+            Form1 form1 = new Form1(modbusConnection, dataViewService, contextMenuService);
+
+            Application.Run(form1);
         }
     }
 }
