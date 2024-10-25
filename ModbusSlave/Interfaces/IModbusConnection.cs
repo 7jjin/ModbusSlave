@@ -11,5 +11,6 @@ namespace ModbusSlave.Interfaces
     {
         void Connect();
         Task<ushort[]> ReadHoldingRegistersAsync(ushort startAddress, ushort quantity);
+        Task WriteHoldingRegistersAsync(ushort startAddress, ushort[] values);
     }
 }

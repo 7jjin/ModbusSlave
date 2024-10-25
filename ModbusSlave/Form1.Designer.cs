@@ -147,6 +147,7 @@
             this.btnWriteData.TabIndex = 33;
             this.btnWriteData.Text = "Write";
             this.btnWriteData.UseVisualStyleBackColor = true;
+            this.btnWriteData.Click += new System.EventHandler(this.btnWriteData_Click_1);
             // 
             // txt_ReadQuantity
             // 

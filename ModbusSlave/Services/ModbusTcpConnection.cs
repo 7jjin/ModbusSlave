@@ -66,7 +66,16 @@ namespace ModbusSlave.Services
             // 기존 데이터 읽기 로직
             return await Task.FromResult(_dataStore.HoldingRegisters.ReadPoints(startAddress, quantity));
         }
+        public async Task WriteHoldingRegistersAsync(ushort startAddress, ushort[] values)
+        {
+            if (_slave == null)
+            {
+                throw new InvalidOperationException("ModbusMaster is not connected.");
+            }
 
+            // 값들을 Holding Register에 쓰기
+            await Task.Run(() => _dataStore.HoldingRegisters.WritePoints(startAddress, values));
+        }
 
     }
 }
