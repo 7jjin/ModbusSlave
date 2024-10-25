@@ -13,7 +13,6 @@ namespace ModbusSlave.Services
     {
         private DataGridView _dataView;
         private readonly ContextMenuService _contextMenuService;
-
         private List<CellData> _cellDataList;
 
         public DataViewService(ContextMenuService contextMenuService)

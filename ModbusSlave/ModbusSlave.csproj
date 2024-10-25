@@ -64,12 +64,14 @@
     <Compile Include="Interfaces\IContextMenuService.cs" />
     <Compile Include="Interfaces\IModbusConnection.cs" />
     <Compile Include="Interfaces\IDataViewService.cs" />
+    <Compile Include="Interfaces\IModbusDataStore.cs" />
     <Compile Include="Models\CellData.cs" />
     <Compile Include="Models\DataType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ContextMenuService.cs" />
     <Compile Include="Services\DataViewService.cs" />
+    <Compile Include="Services\ModbusDataStore.cs" />
     <Compile Include="Services\ModbusTcpConnection.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

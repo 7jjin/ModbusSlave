@@ -1,59 +1,72 @@
-﻿using ModbusSlave.Interfaces;
+﻿
+using ModbusSlave.Interfaces;
 using NModbus;
+using NModbus.Data;
+using NModbus.Device;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Data;
 using System.Net;
-using System.Net.Http;
 using System.Net.Sockets;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+
 
 namespace ModbusSlave.Services
-{
+{  
     public class ModbusTcpConnection : IModbusConnection
     {
         private TcpListener _tcpListener;
         private IModbusSlaveNetwork _slaveNetwork;
+        private IModbusSlave _slave;
+        private DefaultSlaveDataStore _dataStore;
+        private DataGridView _dataView;
+
+        public ModbusTcpConnection()
+        {
+            _tcpListener = new TcpListener(System.Net.IPAddress.Parse("127.0.0.1"), 502);
+            // 기본 데이터 저장소 생성 (Coils, Inputs, Holding Registers, Input Registers)
+            _dataStore = new DefaultSlaveDataStore();
+        }
 
         public void Connect()
         {
             try
             {
-                _tcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 502);
                 _tcpListener.Start();
-
                 var factory = new ModbusFactory();
-                var slave = factory.CreateSlave(1);
 
+                // Slave ID 1을 가진 Slave 생성
+                _slave = factory.CreateSlave(1, _dataStore);
+
+                // Modbus Slave 네트워크 생성 및 Slave 추가
                 _slaveNetwork = factory.CreateSlaveNetwork(_tcpListener);
-                _slaveNetwork.AddSlave(slave);
+                _slaveNetwork.AddSlave(_slave);
 
-                Task.Run(() => ListenForRequests());
+                // 비동기적으로 요청을 처리하도록 설정
+                Task.Run(async () => await _slaveNetwork.ListenAsync());
+
+                Console.WriteLine("Modbus Slave started...");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to connect: {ex.Message}");
-                throw;
+                MessageBox.Show(ex.Message);
             }
         }
-
-        private async Task ListenForRequests()
+        // 특정 Holding Register 값 업데이트
+        // 특정 Holding Register 값 업데이트
+        public async Task<ushort[]> ReadHoldingRegistersAsync(ushort startAddress, ushort quantity)
         {
-            try
+            if (_slave == null)
             {
-                Console.WriteLine("Waiting for Modbus Master requests...");
-                while (true)
-                {
-                    // Master의 연결 수락
-                    var client = await _tcpListener.AcceptTcpClientAsync();
-                    Console.WriteLine("Modbus Master connected.");
+                throw new InvalidOperationException("ModbusMaster is not connected.");
+            }
 
-                    // 요청 수신 및 처리
-                    await _slaveNetwork.ListenAsync();
-                }
-            } catch (Exception ex) { Console.WriteLine($"Error while listening for requests: {ex.Message}"); };
+            // 기존 데이터 읽기 로직
+            return await Task.FromResult(_dataStore.HoldingRegisters.ReadPoints(startAddress, quantity));
         }
+
 
     }
 }

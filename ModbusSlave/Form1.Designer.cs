@@ -209,6 +209,7 @@
             this.btnReadData.TabIndex = 26;
             this.btnReadData.Text = "Read";
             this.btnReadData.UseVisualStyleBackColor = true;
+            this.btnReadData.Click += new System.EventHandler(this.btnReadData_Click);
             // 
             // dataView
             // 

@@ -21,19 +21,26 @@ namespace ModbusSlave
         public Form1(IModbusConnection modbusConnection, IDataViewService dataViewService, IContextMenuService contextMenuService)
         {
             InitializeComponent();
+            
             this.Text = "Modbus Slave";
             _modbusConnection = modbusConnection;
             _dataViewService = dataViewService;
             _contextMenuService = contextMenuService;
 
+            _modbusConnection.Connect();
             dataView.MouseDown += DataView_MouseDown;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            _modbusConnection.Connect();
+           
             _dataViewService.InitializeDataView(dataView);
             _dataViewService.LoadData(dataView);
+
+            txt_ReadAddress.Text = "0";
+            txt_ReadQuantity.Text = "10";
+            txt_WriteAddress.Text = "0";
+            txt_WriteQuantity.Text = "10";
         }
 
         /// <summary>
@@ -56,6 +63,54 @@ namespace ModbusSlave
                 }
             }
             
+        }
+
+        private async void btnReadData_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ushort startAddress;
+                if (!ushort.TryParse(txt_ReadAddress.Text, out startAddress))
+                {
+                    MessageBox.Show("올바른 주소 값을 입력해주세요.");
+                    return;
+                }
+                ushort quantity;
+                if (!ushort.TryParse(txt_ReadQuantity.Text, out quantity))
+                {
+                    MessageBox.Show("올바른 수량 값을 입력해주세요.");
+                    return;
+                }
+
+                ushort[] holdingRegisters = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, quantity);
+
+                for (int i = 0; i < holdingRegisters.Length; i++)
+                {
+                    // 16bit Signed값으로 변경 
+                    if (i < dataView.Rows.Count) 
+                    {
+                        int signedValue = (short)holdingRegisters[i];
+                        string displayValue;
+
+                        if(signedValue < -32768 || signedValue > 32767)
+                        {
+                            displayValue = holdingRegisters[i].ToString();
+                        }
+                        else
+                        {
+                            displayValue = signedValue.ToString();
+                        }
+                        dataView.Rows[i].Cells[1].Value = displayValue;
+                        dataView.AllowUserToAddRows = true;
+                    }
+                }
+
+                MessageBox.Show("Successfully read data from Modbus Master.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to read data: {ex.Message}");
+            }
         }
     }
 }
