@@ -11,6 +11,7 @@ namespace ModbusSlave.Models
         Signed,
         Unsigned,
         Hex,
-        Binary
+        Binary,
+
     }
 }
