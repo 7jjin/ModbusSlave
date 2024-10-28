@@ -134,7 +134,7 @@
             this.lbl_WriteTest.AutoSize = true;
             this.lbl_WriteTest.Location = new System.Drawing.Point(431, 223);
             this.lbl_WriteTest.Name = "lbl_WriteTest";
-            this.lbl_WriteTest.Size = new System.Drawing.Size(73, 15);
+            this.lbl_WriteTest.Size = new System.Drawing.Size(91, 19);
             this.lbl_WriteTest.TabIndex = 34;
             this.lbl_WriteTest.Text = "Write Test";
             // 
