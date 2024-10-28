@@ -84,7 +84,7 @@ namespace ModbusSlave
         private void Form2_Load_1(object sender, EventArgs e)
         {
             txt_Value.KeyPress -= TextBox_KeyPress_NumericOnly;
-            if (_dataType == DataType.Signed || _dataType == DataType.Unsigned)
+            if (_dataType == DataType.Signed || _dataType == DataType.Unsigned || _dataType == DataType.Signed32 || _dataType == DataType.Unsigned32 || _dataType == DataType.Signed64 || _dataType == DataType.Unsigned64)
             {
                 txt_Value.KeyPress += TextBox_KeyPress_NumericOnly;
             }else if(_dataType == DataType.Hex)
@@ -112,6 +112,8 @@ namespace ModbusSlave
         private bool ValidateInput(DataType dataType)
         {
             int value;
+            long longValue;
+            ulong ulongValue;
             switch (_dataType)
             {
                 case DataType.Signed:
@@ -128,6 +130,41 @@ namespace ModbusSlave
                     if (!int.TryParse(txt_Value.Text, out value) || value <= 0 || value > 65535)
                     {
                         MessageBox.Show("Unsigned 값은 0 ~ 65535 사이여야 합니다.", "입력 오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return false;
+                    }
+                    break;
+                case DataType.Signed32:
+                    // Signed 32-bit 입력 처리
+                    if (!long.TryParse(txt_Value.Text, out longValue) || longValue < -2147483648L || longValue > 2147483647L)
+                    {
+                        MessageBox.Show("Signed32 값은 -2147483648 ~ 2147483647 사이여야 합니다.", "입력 오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return false;
+                    }
+                    break;
+
+                case DataType.Unsigned32:
+                    // Unsigned 32-bit 입력 처리
+                    if (!ulong.TryParse(txt_Value.Text, out ulongValue) || ulongValue > 4294967295UL)
+                    {
+                        MessageBox.Show("Unsigned32 값은 0 ~ 4294967295 사이여야 합니다.", "입력 오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return false;
+                    }
+                    break;
+
+                case DataType.Signed64:
+                    // Signed 64-bit 입력 처리
+                    if (!long.TryParse(txt_Value.Text, out longValue) || longValue < -9223372036854775808L || longValue > 9223372036854775807L)
+                    {
+                        MessageBox.Show("Signed64 값은 -9223372036854775808 ~ 9223372036854775807 사이여야 합니다.", "입력 오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return false;
+                    }
+                    break;
+
+                case DataType.Unsigned64:
+                    // Unsigned 64-bit 입력 처리
+                    if (!ulong.TryParse(txt_Value.Text, out ulongValue) || ulongValue > 18446744073709551615UL)
+                    {
+                        MessageBox.Show("Unsigned64 값은 0 ~ 18446744073709551615 사이여야 합니다.", "입력 오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return false;
                     }
                     break;

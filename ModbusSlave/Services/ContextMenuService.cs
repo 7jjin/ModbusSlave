@@ -93,6 +93,11 @@ namespace ModbusSlave.Services
             }
         }
 
+        /// <summary>
+        /// 어떤 타입의 Endian을 선택했는지 Form2에 전달하는 함수
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnEndianTypeSelected(object sender, EventArgs e)
         {
             // 선택된 서브 메뉴 항목
