@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -15,11 +16,14 @@ namespace ModbusSlave.Services
         private DataGridView _dataView;
         private readonly ContextMenuService _contextMenuService;
         private List<CellData> _cellDataList;
+        private IModbusConnection _modbusConnection;
 
-        public DataViewService(ContextMenuService contextMenuService)
+
+        public DataViewService(ContextMenuService contextMenuService, IModbusConnection modbusConnection)
         {
             _contextMenuService = contextMenuService;
             _cellDataList = new List<CellData>();
+            _modbusConnection = modbusConnection;
         }
 
         public void InitializeDataView(DataGridView dataView)
@@ -54,18 +58,45 @@ namespace ModbusSlave.Services
         /// <param name="e"></param>
         private void dataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.ColumnIndex == 1) // 예를 들어, 두 번째 열이 데이터 입력 열이라고 가정
-            {
-                Form2 dataInputForm = new Form2(_cellDataList[e.RowIndex].Type);
-                if (dataInputForm.ShowDialog() == DialogResult.OK)
-                {
-                   _cellDataList[e.RowIndex].Value = dataInputForm.InputValue;
+            // e.RowIndex가 유효한지 확인
+            if (e.RowIndex < 0) return;
 
-                    // DataGridView에 값 업데이트
-                    _dataView.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = dataInputForm.InputValue;
+            // HeaderText에서 ushort 값 가져오기
+            if (ushort.TryParse(_dataView.Columns[1].HeaderText, out ushort headerValue))
+            {
+                // 클릭한 셀의 0열 값 가져오기
+                // 0열에서 현재 행의 값을 가져오고 ushort로 변환
+                if (ushort.TryParse(_dataView.Rows[e.RowIndex].Cells[0].Value.ToString(), out ushort cellValue))
+                {
+                    // startAddress 계산
+                    ushort startAddress = (ushort)(headerValue + cellValue);
+
+                    // 두 번째 열이 클릭된 경우에만 Form2를 연다.
+                    if (e.ColumnIndex == 1) // 예를 들어, 두 번째 열이 데이터 입력 열이라고 가정
+                    {
+                        Form2 dataInputForm = new Form2(_cellDataList[e.RowIndex].Type, startAddress, _modbusConnection);
+                        if (dataInputForm.ShowDialog() == DialogResult.OK)
+                        {
+                            _cellDataList[e.RowIndex].Value = dataInputForm.InputValue;
+
+                            // DataGridView에 값 업데이트
+                            _dataView.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = dataInputForm.InputValue;
+                        }
+                    }
+                }
+                else
+                {
+                    // 셀의 값이 ushort로 변환 불가할 경우 처리
+                    MessageBox.Show("0열의 값을 읽을 수 없습니다.");
                 }
             }
+            else
+            {
+                // HeaderText가 ushort로 변환 불가할 경우 처리
+                MessageBox.Show("헤더 텍스트를 읽을 수 없습니다.");
+            }
         }
+
 
         /// <summary>
         /// 지정한 수량(quantity)만큼 CellData의 데이터 타입을 Signed로 변경

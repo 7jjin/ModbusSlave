@@ -57,6 +57,7 @@ namespace ModbusSlave
             {
                 // 40001을 더한 값 계산
                 int result = inputValue + 40001;
+                
 
                 // 계산 결과를 Label에 표시
                 lbl_ReadPlcAddress.Text = result.ToString();
@@ -82,6 +83,7 @@ namespace ModbusSlave
 
                 // 계산 결과를 Label에 표시
                 lbl_WritePlcAddress.Text = result.ToString();
+                dataView.Columns[1].HeaderText = $"{result}";
             }
             else
             {

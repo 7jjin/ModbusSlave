@@ -1,10 +1,12 @@
-﻿using ModbusSlave.Models;
+﻿using ModbusSlave.Interfaces;
+using ModbusSlave.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -15,20 +17,25 @@ namespace ModbusSlave
 {
     public partial class Form2 : Form
     {
+        private IModbusConnection _modbusConnection;
         public object InputValue { get; private set; }
         private DataType _dataType;
-        public Form2(DataType dataType)
+        private ushort _startAddress;
+        public Form2(DataType dataType, ushort address, IModbusConnection modbusConnection)
         {
             InitializeComponent();
             _dataType = dataType;
+            _startAddress = address;
             this.Text = $"Enter {dataType}";
+            _modbusConnection = modbusConnection;
            
-            btnOk.Click += (s, e) =>
+            btnOk.Click += async (s, e) =>
             {
                 if (ValidateInput(dataType))
                 {
                     InputValue = txt_Value.Text;
                     this.DialogResult = DialogResult.OK;
+                    await SendDataToModbusMasterAsync();
                     this.Close();
                 }
             };
@@ -38,6 +45,42 @@ namespace ModbusSlave
             };
 
         }
+
+
+        // 데이터 전송 메서드
+        private async Task SendDataToModbusMasterAsync()
+        {
+            // DataType에 따라 데이터를 ushort로 변환
+            ushort valueToSend = ConvertToUshort(_dataType, InputValue.ToString());
+            _startAddress -= 40001;
+
+            // 시작 주소 및 Modbus 연결을 위한 접근 (여기서는 startAddress를 e.RowIndex로 가정)
+            await _modbusConnection.WriteHoldingRegistersAsync(_startAddress, new ushort[] { valueToSend });
+        }
+
+        private ushort ConvertToUshort(DataType dataType, string inputValue)
+        {
+            ushort result;
+            switch (dataType)
+            {
+                case DataType.Hex:
+                    result = ushort.Parse(inputValue.Substring(2), System.Globalization.NumberStyles.HexNumber);
+                    break;
+                case DataType.Binary:
+                    result = Convert.ToUInt16(inputValue, 2);
+                    break;
+                case DataType.Signed:
+                    result = (ushort)short.Parse(inputValue);
+                    break;
+                case DataType.Unsigned:
+                    result = ushort.Parse(inputValue);
+                    break;
+                default:
+                    throw new InvalidOperationException("지원되지 않는 데이터 타입입니다.");
+            }
+            return result;
+        }
+
         private void Form2_Load_1(object sender, EventArgs e)
         {
             txt_Value.KeyPress -= TextBox_KeyPress_NumericOnly;

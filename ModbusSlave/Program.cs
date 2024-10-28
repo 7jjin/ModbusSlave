@@ -23,7 +23,7 @@ namespace ModbusSlave
             IContextMenuService contextMenuService = new ContextMenuService();
 
             // DataViewService 생성
-            IDataViewService dataViewService = new DataViewService((ContextMenuService)contextMenuService);
+            IDataViewService dataViewService = new DataViewService((ContextMenuService)contextMenuService,modbusConnection);
 
             // DataViewService가 생성된 이후, ContextMenuService에 설정
             ((ContextMenuService)contextMenuService).SetDataViewService(dataViewService);
