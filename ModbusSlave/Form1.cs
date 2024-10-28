@@ -151,7 +151,7 @@ namespace ModbusSlave
                         dataView.AllowUserToAddRows = true;
                     }
                 }
-
+                _dataViewService.SetCellsToSigned(holdingRegisters.Length - 1);
                 MessageBox.Show("Successfully read data from Modbus Master.");
             }
             catch (Exception ex)

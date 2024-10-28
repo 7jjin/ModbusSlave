@@ -68,6 +68,22 @@ namespace ModbusSlave.Services
         }
 
         /// <summary>
+        /// 지정한 수량(quantity)만큼 CellData의 데이터 타입을 Signed로 변경
+        /// </summary>
+        /// <param name="quantity">변경할 셀의 수량</param>
+        public void SetCellsToSigned(int quantity)
+        {
+            // quantity가 cellDataList의 크기를 초과하지 않도록 제한
+            //int cellsToChange = Math.Min(quantity, _cellDataList.Count);
+
+            for (int i = 0; i < quantity; i++)
+            {
+                // DataType을 Signed로 변경
+                _cellDataList[i].Type = DataType.Signed;
+            }
+        }
+
+        /// <summary>
         /// 데이터 타입 변경에 따른 Cell값 변경
         /// </summary>
         /// <param name="rowIndex"></param>
