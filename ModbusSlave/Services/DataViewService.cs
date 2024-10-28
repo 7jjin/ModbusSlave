@@ -120,7 +120,7 @@ namespace ModbusSlave.Services
         /// <param name="rowIndex"></param>
         /// <param name="columnIndex"></param>
         /// <param name="selectedType"></param>
-        public void UpdateCellData(int rowIndex, int columnIndex, DataType selectedType)
+        public void UpdateCellData(int rowIndex, int columnIndex, DataType selectedType, string edianType)
         {
             if (columnIndex == 1)  // 두 번째 열만 처리
             {

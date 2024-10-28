@@ -32,13 +32,10 @@
             this.label5 = new System.Windows.Forms.Label();
             this.lbl_ReadPlcAddress = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.txt_WriteQuantity = new System.Windows.Forms.TextBox();
-            this.lbl_WriteQuantity = new System.Windows.Forms.Label();
             this.txt_WriteAddress = new System.Windows.Forms.TextBox();
             this.lbl_WriteAddress = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.lbl_WriteTest = new System.Windows.Forms.Label();
-            this.btnWriteData = new System.Windows.Forms.Button();
             this.txt_ReadQuantity = new System.Windows.Forms.TextBox();
             this.lbl_ReadQuantity = new System.Windows.Forms.Label();
             this.txt_ReadAddress = new System.Windows.Forms.TextBox();
@@ -86,23 +83,6 @@
             this.label2.TabIndex = 40;
             this.label2.Text = "PLC address =";
             // 
-            // txt_WriteQuantity
-            // 
-            this.txt_WriteQuantity.Location = new System.Drawing.Point(521, 326);
-            this.txt_WriteQuantity.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.txt_WriteQuantity.Name = "txt_WriteQuantity";
-            this.txt_WriteQuantity.Size = new System.Drawing.Size(436, 25);
-            this.txt_WriteQuantity.TabIndex = 39;
-            // 
-            // lbl_WriteQuantity
-            // 
-            this.lbl_WriteQuantity.AutoSize = true;
-            this.lbl_WriteQuantity.Location = new System.Drawing.Point(445, 329);
-            this.lbl_WriteQuantity.Name = "lbl_WriteQuantity";
-            this.lbl_WriteQuantity.Size = new System.Drawing.Size(62, 15);
-            this.lbl_WriteQuantity.TabIndex = 38;
-            this.lbl_WriteQuantity.Text = "Quantity";
-            // 
             // txt_WriteAddress
             // 
             this.txt_WriteAddress.Location = new System.Drawing.Point(521, 284);
@@ -134,20 +114,9 @@
             this.lbl_WriteTest.AutoSize = true;
             this.lbl_WriteTest.Location = new System.Drawing.Point(431, 223);
             this.lbl_WriteTest.Name = "lbl_WriteTest";
-            this.lbl_WriteTest.Size = new System.Drawing.Size(91, 19);
+            this.lbl_WriteTest.Size = new System.Drawing.Size(73, 15);
             this.lbl_WriteTest.TabIndex = 34;
             this.lbl_WriteTest.Text = "Write Test";
-            // 
-            // btnWriteData
-            // 
-            this.btnWriteData.Location = new System.Drawing.Point(875, 371);
-            this.btnWriteData.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.btnWriteData.Name = "btnWriteData";
-            this.btnWriteData.Size = new System.Drawing.Size(82, 28);
-            this.btnWriteData.TabIndex = 33;
-            this.btnWriteData.Text = "Write";
-            this.btnWriteData.UseVisualStyleBackColor = true;
-            this.btnWriteData.Click += new System.EventHandler(this.btnWriteData_Click_1);
             // 
             // txt_ReadQuantity
             // 
@@ -239,13 +208,10 @@
             this.Controls.Add(this.label5);
             this.Controls.Add(this.lbl_ReadPlcAddress);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.txt_WriteQuantity);
-            this.Controls.Add(this.lbl_WriteQuantity);
             this.Controls.Add(this.txt_WriteAddress);
             this.Controls.Add(this.lbl_WriteAddress);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.lbl_WriteTest);
-            this.Controls.Add(this.btnWriteData);
             this.Controls.Add(this.txt_ReadQuantity);
             this.Controls.Add(this.lbl_ReadQuantity);
             this.Controls.Add(this.txt_ReadAddress);
@@ -269,13 +235,10 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label lbl_ReadPlcAddress;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox txt_WriteQuantity;
-        private System.Windows.Forms.Label lbl_WriteQuantity;
         private System.Windows.Forms.TextBox txt_WriteAddress;
         private System.Windows.Forms.Label lbl_WriteAddress;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label lbl_WriteTest;
-        private System.Windows.Forms.Button btnWriteData;
         private System.Windows.Forms.TextBox txt_ReadQuantity;
         private System.Windows.Forms.Label lbl_ReadQuantity;
         private System.Windows.Forms.TextBox txt_ReadAddress;

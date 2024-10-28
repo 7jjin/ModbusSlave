@@ -63,18 +63,18 @@ namespace ModbusSlave.Services
             return selectedType;
         }
 
-        private void AddEndianSubMenu(ToolStripMenuItem menuItem)
+        private void AddEndianSubMenu(ToolStripMenuItem parentItem)
         {
-            var bigEndianItem = new ToolStripMenuItem("Big-endian");
-            var littleEndianItem = new ToolStripMenuItem("Little-endian");
-            var bigEndianByteSwapItem = new ToolStripMenuItem("Big-endian Byte Swap");
-            var littleEndianByteSwapItem = new ToolStripMenuItem("Little-endian Byte Swap");
+            var bigEndianItem = new ToolStripMenuItem("Big-endian", null, OnEndianTypeSelected);
+            var littleEndianItem = new ToolStripMenuItem("Little-endian", null, OnEndianTypeSelected);
+            var bigEndianByteSwapItem = new ToolStripMenuItem("Big-endian Byte Swap", null, OnEndianTypeSelected);
+            var littleEndianByteSwapItem = new ToolStripMenuItem("Little-endian Byte Swap", null, OnEndianTypeSelected);
 
-            // 메뉴에 서브 메뉴 추가
-            menuItem.DropDownItems.Add("bigEndianItem", null, (s, e) => OnTypeSelected(DataType.Signed));
-            menuItem.DropDownItems.Add("littleEndianItem", null, (s, e) => OnTypeSelected(DataType.Signed));
-            menuItem.DropDownItems.Add("bigEndianByteSwapItem", null, (s, e) => OnTypeSelected(DataType.Signed));
-            menuItem.DropDownItems.Add("littleEndianByteSwapItem", null, (s, e) => OnTypeSelected(DataType.Signed));
+            // 서브 메뉴를 부모 메뉴에 추가
+            parentItem.DropDownItems.Add(bigEndianItem);
+            parentItem.DropDownItems.Add(littleEndianItem);
+            parentItem.DropDownItems.Add(bigEndianByteSwapItem);
+            parentItem.DropDownItems.Add(littleEndianByteSwapItem);
         }
 
         private void OnTypeSelected(DataType type)
@@ -85,11 +85,49 @@ namespace ModbusSlave.Services
             // _dataViewService가 null이 아닌지 확인 후 호출
             if (_dataViewService != null)
             {
-                _dataViewService.UpdateCellData(_rowIndex, _columnIndex, type);
+                _dataViewService.UpdateCellData(_rowIndex, _columnIndex, type, "none");
             }
             else
             {
                 MessageBox.Show("DataViewService가 주입되지 않았습니다.");
+            }
+        }
+
+        private void OnEndianTypeSelected(object sender, EventArgs e)
+        {
+            // 선택된 서브 메뉴 항목
+            var selectedItem = sender as ToolStripMenuItem;
+
+            // 부모 메뉴 항목
+            var parentItem = selectedItem?.OwnerItem as ToolStripMenuItem;
+            if (parentItem != null)
+            {
+                string parentMenuText = parentItem.Text; // 예: "32-bit Signed"
+                string selectedEndianType = selectedItem.Text; // 예: "Big-endian"
+
+                // 부모와 서브 메뉴 텍스트 정보를 UpdateCellData로 전달
+                if (_dataViewService != null)
+                {
+                    if(parentMenuText == "32-bit Signed")
+                    {
+                        _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Signed32, selectedEndianType);
+                    }
+                    else if(parentMenuText == "32-bit Unsigned")
+                    {
+                        _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Unsigned32, selectedEndianType);
+                    }else if(parentMenuText == "64-bit Signed")
+                    {
+                        _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Signed64, selectedEndianType);
+                    }
+                    else if (parentMenuText == "64-bit Unsigned")
+                    {
+                        _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Unsigned64, selectedEndianType);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("DataViewService가 주입되지 않았습니다.");
+                }
             }
         }
 
@@ -99,124 +137,7 @@ namespace ModbusSlave.Services
             return int.Parse(value);
         }
 
-        /// <summary>
-        /// 어떤 타입의 Big-Endian을 클릭했는지 확인하는 방법
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        //private void OnBigEndianClick(DataType type)
-        //{
-        //    var selectedCell = _dataView.SelectedCells[1].Value.ToString();
-        //    int currentRowIndex = _dataView.SelectedCells[1].RowIndex;
-        //    int currentColumnIndex = _dataView.SelectedCells[1].ColumnIndex;
-
-        //    if (currentRowIndex + 1 >= _dataView.Rows.Count)
-        //    {
-        //        MessageBox.Show("다음 행이 존재하지 않습니다.");
-        //        return;
-        //    }
-
-        //    var nextCell = _dataView.Rows[currentRowIndex + 1].Cells[currentColumnIndex].Value.ToString();
-        //    // sender를 ToolStripMenuItem으로 캐스팅
-        //    if (sender is ToolStripMenuItem item)
-        //    {
-        //        // OwnerItem을 통해 상위 메뉴 아이템 확인
-        //        if (item.OwnerItem is ToolStripMenuItem parentItem)
-        //        {
-        //            string parentText = parentItem.Text;
-
-        //            // 32bit-signed, 32bit-Unsigned, 64bit-signed, 64bit-Unsigned 확인
-        //            if (parentText == "32-bit Signed")
-        //            {
-        //                string signedBigEndian32Bit = Convert.ToString(Convert32bitToBigEndian(selectedCell, nextCell));
-        //                _dataView.SelectedCells[1].Value = signedBigEndian32Bit;
-        //                _dataView.Rows[currentRowIndex + 1].Cells[currentColumnIndex].Value = "-";
-        //                DataType
-        //            }
-        //        }
-        //    }
-        //}
-
-        /// <summary>
-        /// 32bit Signed Big-endian
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private long Convert32bitToBigEndian(string firstCellData, string secondCellData)
-         {
-
-
-            // 두 셀의 값을 16-bit로 읽어와 결합
-            ushort upperValue = ConvertToUnsigned16(firstCellData);
-            ushort lowerValue = ConvertToUnsigned16(secondCellData);
-
-            // Big-endian으로 변환
-            uint bigEndianValue = ((uint)upperValue << 16) | lowerValue;
-
-            // 32bit signed로 변환 (부호 있는 값을 처리)
-            int result = unchecked((int)bigEndianValue);
-            return result;
-        }
-
-        private void OnLittleEndianClick(object sender, EventArgs e)
-        {
-            // sender를 ToolStripMenuItem으로 캐스팅
-            if (sender is ToolStripMenuItem item)
-            {
-                // OwnerItem을 통해 상위 메뉴 아이템 확인
-                if (item.OwnerItem is ToolStripMenuItem parentItem)
-                {
-                    string parentText = parentItem.Text;
-
-                    // 32bit-signed, 32bit-Unsigned, 64bit-signed, 64bit-Unsigned 확인
-                    if (parentText == "32-bit Signed" || parentText == "32-bit Unsigned" ||
-                        parentText == "64-bit Signed" || parentText == "64-bit Unsigned")
-                    {
-                        MessageBox.Show($"{parentText}의 Big-endian이 선택되었습니다.");
-                    }
-                }
-            }
-        }
-
-        private void OnBigEndianByteSwapClick(object sender, EventArgs e)
-        {
-            // sender를 ToolStripMenuItem으로 캐스팅
-            if (sender is ToolStripMenuItem item)
-            {
-                // OwnerItem을 통해 상위 메뉴 아이템 확인
-                if (item.OwnerItem is ToolStripMenuItem parentItem)
-                {
-                    string parentText = parentItem.Text;
-
-                    // 32bit-signed, 32bit-Unsigned, 64bit-signed, 64bit-Unsigned 확인
-                    if (parentText == "32-bit Signed" || parentText == "32-bit Unsigned" ||
-                        parentText == "64-bit Signed" || parentText == "64-bit Unsigned")
-                    {
-                        MessageBox.Show($"{parentText}의 Big-endian이 선택되었습니다.");
-                    }
-                }
-            }
-        }
-
-        private void OnLittleEndianByteSwapClick(Object sender, EventArgs e)
-        {
-            // sender를 ToolStripMenuItem으로 캐스팅
-            if (sender is ToolStripMenuItem item)
-            {
-                // OwnerItem을 통해 상위 메뉴 아이템 확인
-                if (item.OwnerItem is ToolStripMenuItem parentItem)
-                {
-                    string parentText = parentItem.Text;
-
-                    // 32bit-signed, 32bit-Unsigned, 64bit-signed, 64bit-Unsigned 확인
-                    if (parentText == "32-bit Signed" || parentText == "32-bit Unsigned" ||
-                        parentText == "64-bit Signed" || parentText == "64-bit Unsigned")
-                    {
-                        MessageBox.Show($"{parentText}의 Big-endian이 선택되었습니다.");
-                    }
-                }
-            }
-        }
+        
 
 
 
