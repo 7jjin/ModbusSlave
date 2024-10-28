@@ -30,6 +30,8 @@ namespace ModbusSlave
 
             _modbusConnection.Connect();
             dataView.MouseDown += DataView_MouseDown;
+            txt_ReadAddress.TextChanged += Txt_ReadAddress_TextChanged;
+            txt_WriteAddress.TextChanged += Txt_WriteAddress_TextChanged;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -42,6 +44,50 @@ namespace ModbusSlave
             txt_ReadQuantity.Text = "10";
             txt_WriteAddress.Text = "0";
             txt_WriteQuantity.Text = "10";
+        }
+
+        /// <summary>
+        /// ReadAddress 텍스트 박스의 입력값이 바뀔 때마다 PLC Label값도 바뀜
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Txt_ReadAddress_TextChanged(object sender, EventArgs e)
+        {
+            if (ushort.TryParse(txt_ReadAddress.Text, out ushort inputValue))
+            {
+                // 40001을 더한 값 계산
+                int result = inputValue + 40001;
+
+                // 계산 결과를 Label에 표시
+                lbl_ReadPlcAddress.Text = result.ToString();
+            }
+            else
+            {
+                // 변환이 실패하면 에러 메시지 표시
+                MessageBox.Show("올바른 숫자를 입력하세요.");
+            }
+        }
+
+        /// <summary>
+        /// WriteAddress 텍스트 박스의 입력값이 바뀔 때마다 PLC Label값도 바뀜
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Txt_WriteAddress_TextChanged(object sender, EventArgs e)
+        {
+            if (ushort.TryParse(txt_WriteAddress.Text, out ushort inputValue))
+            {
+                // 40001을 더한 값 계산
+                int result = inputValue + 40001;
+
+                // 계산 결과를 Label에 표시
+                lbl_WritePlcAddress.Text = result.ToString();
+            }
+            else
+            {
+                // 변환이 실패하면 에러 메시지 표시
+                MessageBox.Show("올바른 숫자를 입력하세요.");
+            }
         }
 
         /// <summary>

@@ -67,6 +67,7 @@
     <Compile Include="Interfaces\IModbusDataStore.cs" />
     <Compile Include="Models\CellData.cs" />
     <Compile Include="Models\DataType.cs" />
+    <Compile Include="Models\EndianType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ContextMenuService.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Services\ModbusTcpConnection.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Form2.resx">
       <DependentUpon>Form2.cs</DependentUpon>

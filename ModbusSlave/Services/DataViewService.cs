@@ -68,7 +68,7 @@ namespace ModbusSlave.Services
         }
 
         /// <summary>
-        /// 데이터 타입 변경
+        /// 데이터 타입 변경에 따른 Cell값 변경
         /// </summary>
         /// <param name="rowIndex"></param>
         /// <param name="columnIndex"></param>
@@ -79,6 +79,7 @@ namespace ModbusSlave.Services
             {
                 _cellDataList[rowIndex].Type = selectedType;  // 선택된 타입으로 업데이트
                 var selectedCell = _dataView.Rows[rowIndex].Cells[1];
+                Console.WriteLine(_cellDataList);
 
                 if(selectedType == DataType.Signed)
                 {

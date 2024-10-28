@@ -6,15 +6,11 @@ using System.Threading.Tasks;
 
 namespace ModbusSlave.Models
 {
-    public enum DataType
+    public enum EndianType
     {
-        Signed,
-        Unsigned,
-        Hex,
-        Binary,
-        Signed32,
-        Unsigned32,
-        Signed64,
-        Unsigned64,
+        BigEndian,
+        LittleEndian,
+        BigEndianByteSwap,
+        LittleEndianByteSwap
     }
 }
