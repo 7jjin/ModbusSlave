@@ -77,23 +77,30 @@ namespace ModbusSlave
                     int signed32Value = Int32.Parse(inputValue);
                     return ConvertSigned32BitToUshortArray(signed32Value, endianType);
 
-                //case DataType.Unsigned32:
-                //    uint unsigned32Value = UInt32.Parse(inputValue);
-                //    return ConvertUnsigned32BitToUshortArray(unsigned32Value, endianType);
+                case DataType.Unsigned32:
+                    uint unsigned32Value = UInt32.Parse(inputValue);
+                    return ConvertUnsigned32BitToUshortArray(unsigned32Value, endianType);
 
-                //case DataType.Signed64:
-                //    long signed64Value = long.Parse(inputValue);
-                //    return ConvertSigned64BitToUshortArray(signed64Value, endianType);
+                case DataType.Signed64:
+                    long signed64Value = long.Parse(inputValue);
+                    return ConvertSigned64BitToUshortArray(signed64Value, endianType);
 
-                //case DataType.Unsigned64:
-                //    ulong unsigned64Value = ulong.Parse(inputValue);
-                //    return ConvertUnsigned64BitToUshortArray(unsigned64Value, endianType);
+                case DataType.Unsigned64:
+                    ulong unsigned64Value = ulong.Parse(inputValue);
+                    return ConvertUnsigned64BitToUshortArray(unsigned64Value, endianType);
 
                 default:
                     return new[] { ConvertToUshort(dataType, inputValue, endianType) };
             }
         }
 
+        /// <summary>
+        /// 32 bit Signed
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="endianType"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         private ushort[] ConvertSigned32BitToUshortArray(int value, EndianType endianType)
         {
             switch (endianType)
@@ -142,6 +149,211 @@ namespace ModbusSlave
 
                     // Little-endian Byte Swap 유지
                     return new ushort[] { upperValue, lowerValue };
+                default:
+                    throw new ArgumentException("Unsupported EndianType");
+            }
+        }
+
+        /// <summary>
+        /// 32bit Unsigned
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="endianType"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        private ushort[] ConvertUnsigned32BitToUshortArray(uint value, EndianType endianType)
+        {
+            switch (endianType)
+            {
+                case EndianType.BigEndian:
+                    // 32비트 unsigned 정수를 Big-endian 형식의 바이트 배열로 변환
+                    byte[] bigEndian = BitConverter.GetBytes(value);
+
+                    // 시스템이 Little-endian인 경우 Big-endian 순서를 맞추기 위해 바이트 순서를 뒤집음
+                    if (BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(bigEndian);
+                    }
+
+                    // 상위 16비트와 하위 16비트를 그대로 추출
+                    return new ushort[]
+                    {
+                (ushort)((bigEndian[0] << 8) | bigEndian[1]), // 상위 16비트
+                (ushort)((bigEndian[2] << 8) | bigEndian[3])  // 하위 16비트
+                    };
+
+                case EndianType.LittleEndian:
+                    byte[] littleEndian = BitConverter.GetBytes(value);
+
+                    // 상위 16비트와 하위 16비트를 Little-endian 형식으로 추출
+                    return new ushort[]
+                    {
+                (ushort)((littleEndian[0] << 8) | littleEndian[1]), // 하위 16비트
+                (ushort)((littleEndian[2] << 8) | littleEndian[3])  // 상위 16비트
+                    };
+
+                case EndianType.BigEndianByteSwap:
+                    byte[] bigEndianByteSwap = BitConverter.GetBytes(value);
+
+                    // Big-endian Byte Swap 적용
+                    return new ushort[]
+                    {
+                (ushort)((bigEndianByteSwap[2] << 8) | bigEndianByteSwap[3]), // 하위 16비트 (스왑 적용)
+                (ushort)((bigEndianByteSwap[0] << 8) | bigEndianByteSwap[1])  // 상위 16비트 (스왑 적용)
+                    };
+
+                case EndianType.LittleEndianByteSwap:
+                    // Little-endian Byte Swap 유지
+                    return new ushort[]
+                    {
+                (ushort)(value & 0xFFFF),          // 하위 16비트
+                (ushort)((value >> 16) & 0xFFFF)   // 상위 16비트
+                    };
+
+                default:
+                    throw new ArgumentException("Unsupported EndianType");
+            }
+        }
+
+        /// <summary>
+        /// 64bit Signed
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="endianType"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        private ushort[] ConvertSigned64BitToUshortArray(long value, EndianType endianType)
+        {
+            switch (endianType)
+            {
+                case EndianType.BigEndian:
+                    // 64비트 정수를 Big-endian 형식의 바이트 배열로 변환
+                    byte[] bigEndian = BitConverter.GetBytes(value);
+
+                    // 시스템이 Little-endian인 경우 Big-endian 순서를 맞추기 위해 바이트 순서를 뒤집음
+                    if (BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(bigEndian);
+                    }
+
+                    // 각 16비트 값으로 분할
+                    return new ushort[]
+                    {
+                (ushort)((bigEndian[0] << 8) | bigEndian[1]), // 최상위 16비트
+                (ushort)((bigEndian[2] << 8) | bigEndian[3]), // 두 번째 상위 16비트
+                (ushort)((bigEndian[4] << 8) | bigEndian[5]), // 두 번째 하위 16비트
+                (ushort)((bigEndian[6] << 8) | bigEndian[7])  // 최하위 16비트
+                    };
+
+                case EndianType.LittleEndian:
+                    byte[] littleEndian = BitConverter.GetBytes(value);
+
+                    // 각 16비트 값을 Little-endian 형식으로 추출
+                    return new ushort[]
+                    {
+                (ushort)((littleEndian[0] << 8) | littleEndian[1]), // 최하위 16비트
+                (ushort)((littleEndian[2] << 8) | littleEndian[3]), // 두 번째 하위 16비트
+                (ushort)((littleEndian[4] << 8) | littleEndian[5]), // 두 번째 상위 16비트
+                (ushort)((littleEndian[6] << 8) | littleEndian[7])  // 최상위 16비트
+                    };
+
+                case EndianType.BigEndianByteSwap:
+                    byte[] bigEndianByteSwap = BitConverter.GetBytes(value);
+
+                    // Big-endian에서 바이트 스왑 적용
+                    return new ushort[]
+                    {
+                (ushort)((bigEndianByteSwap[6] << 8) | bigEndianByteSwap[7]), // 최하위 16비트
+                (ushort)((bigEndianByteSwap[4] << 8) | bigEndianByteSwap[5]), // 두 번째 하위 16비트
+                (ushort)((bigEndianByteSwap[2] << 8) | bigEndianByteSwap[3]), // 두 번째 상위 16비트
+                (ushort)((bigEndianByteSwap[0] << 8) | bigEndianByteSwap[1])  // 최상위 16비트
+                    };
+
+                case EndianType.LittleEndianByteSwap:
+                    // 64비트 값을 Little-endian Byte Swap 형식으로 변환
+                    ulong swappedValue = unchecked((ulong)value);
+
+                    // 각 16비트 값을 Little-endian Byte Swap 구조로 분할
+                    return new ushort[]
+                    {
+                (ushort)(swappedValue & 0xFFFF),                    // 최하위 16비트
+                (ushort)((swappedValue >> 16) & 0xFFFF),            // 두 번째 하위 16비트
+                (ushort)((swappedValue >> 32) & 0xFFFF),            // 두 번째 상위 16비트
+                (ushort)((swappedValue >> 48) & 0xFFFF)             // 최상위 16비트
+                    };
+
+                default:
+                    throw new ArgumentException("Unsupported EndianType");
+            }
+        }
+        /// <summary>
+        /// 64bit Unsigned
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="endianType"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        private ushort[] ConvertUnsigned64BitToUshortArray(ulong value, EndianType endianType)
+        {
+            switch (endianType)
+            {
+                case EndianType.BigEndian:
+                    // 64비트 unsigned 정수를 Big-endian 형식의 바이트 배열로 변환
+                    byte[] bigEndian = BitConverter.GetBytes(value);
+
+                    // 시스템이 Little-endian인 경우 Big-endian 순서를 맞추기 위해 바이트 순서를 뒤집음
+                    if (BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(bigEndian);
+                    }
+
+                    // 각 16비트 값으로 분할
+                    return new ushort[]
+                    {
+                (ushort)((bigEndian[0] << 8) | bigEndian[1]), // 최상위 16비트
+                (ushort)((bigEndian[2] << 8) | bigEndian[3]), // 두 번째 상위 16비트
+                (ushort)((bigEndian[4] << 8) | bigEndian[5]), // 두 번째 하위 16비트
+                (ushort)((bigEndian[6] << 8) | bigEndian[7])  // 최하위 16비트
+                    };
+
+                case EndianType.LittleEndian:
+                    byte[] littleEndian = BitConverter.GetBytes(value);
+
+                    // 각 16비트 값을 Little-endian 형식으로 추출
+                    return new ushort[]
+                    {
+                (ushort)((littleEndian[0] << 8) | littleEndian[1]), // 최하위 16비트
+                (ushort)((littleEndian[2] << 8) | littleEndian[3]), // 두 번째 하위 16비트
+                (ushort)((littleEndian[4] << 8) | littleEndian[5]), // 두 번째 상위 16비트
+                (ushort)((littleEndian[6] << 8) | littleEndian[7])  // 최상위 16비트
+                    };
+
+                case EndianType.BigEndianByteSwap:
+                    byte[] bigEndianByteSwap = BitConverter.GetBytes(value);
+
+                    // Big-endian에서 바이트 스왑 적용
+                    return new ushort[]
+                    {
+                (ushort)((bigEndianByteSwap[6] << 8) | bigEndianByteSwap[7]), // 최하위 16비트
+                (ushort)((bigEndianByteSwap[4] << 8) | bigEndianByteSwap[5]), // 두 번째 하위 16비트
+                (ushort)((bigEndianByteSwap[2] << 8) | bigEndianByteSwap[3]), // 두 번째 상위 16비트
+                (ushort)((bigEndianByteSwap[0] << 8) | bigEndianByteSwap[1])  // 최상위 16비트
+                    };
+
+                case EndianType.LittleEndianByteSwap:
+                    // 64비트 값을 Little-endian Byte Swap 형식으로 변환
+                    // unsigned로 처리하므로 ulong로 변환
+                    ulong swappedValue = unchecked((ulong)value);
+
+                    // 각 16비트 값을 Little-endian Byte Swap 구조로 분할
+                    return new ushort[]
+                    {
+                (ushort)(swappedValue & 0xFFFF),                    // 최하위 16비트
+                (ushort)((swappedValue >> 16) & 0xFFFF),            // 두 번째 하위 16비트
+                (ushort)((swappedValue >> 32) & 0xFFFF),            // 두 번째 상위 16비트
+                (ushort)((swappedValue >> 48) & 0xFFFF)             // 최상위 16비트
+                    };
+
                 default:
                     throw new ArgumentException("Unsupported EndianType");
             }
