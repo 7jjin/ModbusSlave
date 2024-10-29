@@ -36,7 +36,7 @@ namespace ModbusSlave.Services
             for (int i = 0; i < 9; i++)
             {
                 dataView.Rows.Add();
-                _cellDataList.Add(new CellData(i,DataType.Signed, 0));    //초기값 Signed, 0 으로 설정
+                _cellDataList.Add(new CellData(i,DataType.Signed, 0,EndianType.none));    //초기값 Signed, 0 으로 설정
             }
             dataView.CellDoubleClick += dataGridView_CellDoubleClick;
         }
@@ -74,7 +74,7 @@ namespace ModbusSlave.Services
                     // 두 번째 열이 클릭된 경우에만 Form2를 연다.
                     if (e.ColumnIndex == 1) // 예를 들어, 두 번째 열이 데이터 입력 열이라고 가정
                     {
-                        Form2 dataInputForm = new Form2(_cellDataList[e.RowIndex].Type, startAddress, _modbusConnection);
+                        Form2 dataInputForm = new Form2(_cellDataList[e.RowIndex].Type, startAddress, _modbusConnection, _cellDataList[e.RowIndex].EndianType);
                         if (dataInputForm.ShowDialog() == DialogResult.OK)
                         {
                             _cellDataList[e.RowIndex].Value = dataInputForm.InputValue;
@@ -120,11 +120,12 @@ namespace ModbusSlave.Services
         /// <param name="rowIndex"></param>
         /// <param name="columnIndex"></param>
         /// <param name="selectedType"></param>
-        public void UpdateCellData(int rowIndex, int columnIndex, DataType selectedType, string edianType)
+        public void UpdateCellData(int rowIndex, int columnIndex, DataType selectedType, EndianType endianType)
         {
             if (columnIndex == 1)  // 두 번째 열만 처리
             {
                 _cellDataList[rowIndex].Type = selectedType;  // 선택된 타입으로 업데이트
+                _cellDataList[rowIndex].EndianType = endianType;
                 var selectedCell = _dataView.Rows[rowIndex].Cells[1];
                 Console.WriteLine(_cellDataList);
 
@@ -155,11 +156,82 @@ namespace ModbusSlave.Services
                     int binaryValue = ConvertToSigned(selectedCell.Value.ToString());
                     string binaryString = binaryValue < 0 ? Convert.ToString((ushort)binaryValue, 2).PadLeft(15, '0') : Convert.ToString(binaryValue, 2).PadLeft(16, '0');
                     selectedCell.Value = binaryString;
+                }else if(selectedType == DataType.Signed32)
+                {
+                    if(endianType == EndianType.BigEndian)
+                    {
+
+                    }else if(endianType == EndianType.LittleEndian)
+                    {
+
+                    }else if(endianType == EndianType.BigEndianByteSwap)
+                    {
+
+                    }else if(endianType == EndianType.LittleEndianByteSwap)
+                    {
+
+                    }
+                }
+                else if (selectedType == DataType.Unsigned32)
+                {
+                    if (endianType == EndianType.BigEndian)
+                    {
+
+                    }
+                    else if (endianType == EndianType.LittleEndian)
+                    {
+
+                    }
+                    else if (endianType == EndianType.BigEndianByteSwap)
+                    {
+
+                    }
+                    else if (endianType == EndianType.LittleEndianByteSwap)
+                    {
+
+                    }
+                }
+                else if (selectedType == DataType.Signed64)
+                {
+                    if (endianType == EndianType.BigEndian)
+                    {
+
+                    }
+                    else if (endianType == EndianType.LittleEndian)
+                    {
+
+                    }
+                    else if (endianType == EndianType.BigEndianByteSwap)
+                    {
+
+                    }
+                    else if (endianType == EndianType.LittleEndianByteSwap)
+                    {
+
+                    }
+                }
+                else if (selectedType == DataType.Unsigned64)
+                {
+                    if (endianType == EndianType.BigEndian)
+                    {
+
+                    }
+                    else if (endianType == EndianType.LittleEndian)
+                    {
+
+                    }
+                    else if (endianType == EndianType.BigEndianByteSwap)
+                    {
+
+                    }
+                    else if (endianType == EndianType.LittleEndianByteSwap)
+                    {
+
+                    }
                 }
 
                 return;
-                // 필요 시 추가 처리 (예: 값 변환)
-                // _cellDataList[rowIndex].Value = 변환된 값;
+             
             }
         }
 

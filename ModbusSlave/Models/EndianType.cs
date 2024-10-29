@@ -8,6 +8,7 @@ namespace ModbusSlave.Models
 {
     public enum EndianType
     {
+        none,
         BigEndian,
         LittleEndian,
         BigEndianByteSwap,

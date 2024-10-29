@@ -14,6 +14,6 @@ namespace ModbusSlave.Interfaces
         void InitializeDataView(DataGridView dataView);
         void LoadData(DataGridView dataGridView);
         void SetCellsToSigned(int count);
-        void UpdateCellData(int rowIndex, int columnIndex, DataType selectedType, string edianType);
+        void UpdateCellData(int rowIndex, int columnIndex, DataType signed32, EndianType bigEndian);
     }
 }

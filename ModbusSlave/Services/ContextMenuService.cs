@@ -85,7 +85,7 @@ namespace ModbusSlave.Services
             // _dataViewService가 null이 아닌지 확인 후 호출
             if (_dataViewService != null)
             {
-                _dataViewService.UpdateCellData(_rowIndex, _columnIndex, type, "none");
+                _dataViewService.UpdateCellData(_rowIndex, _columnIndex, type, EndianType.none);
             }
             else
             {
@@ -115,18 +115,76 @@ namespace ModbusSlave.Services
                 {
                     if(parentMenuText == "32-bit Signed")
                     {
-                        _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Signed32, selectedEndianType);
+                        if(selectedEndianType == "Big-endian")
+                        {
+                            _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Signed32, EndianType.BigEndian);
+                        }else if(selectedEndianType == "Little-endian")
+                        {
+                            _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Signed32, EndianType.LittleEndian);
+                        }else if(selectedEndianType  == "Big-endian Byte Swap")
+                        {
+                            _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Signed32, EndianType.BigEndianByteSwap);
+                        }else if(selectedEndianType == "Little-endian Byte Swap")
+                        {
+                            _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Signed32, EndianType.LittleEndianByteSwap);
+                        }
                     }
                     else if(parentMenuText == "32-bit Unsigned")
                     {
-                        _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Unsigned32, selectedEndianType);
-                    }else if(parentMenuText == "64-bit Signed")
+                        if (selectedEndianType == "Big-endian")
+                        {
+                            _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Unsigned32, EndianType.BigEndian);
+                        }
+                        else if (selectedEndianType == "Little-endian")
+                        {
+                            _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Unsigned32, EndianType.LittleEndian);
+                        }
+                        else if (selectedEndianType == "Big-endian Byte Swap")
+                        {
+                            _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Unsigned32, EndianType.BigEndianByteSwap);
+                        }
+                        else if (selectedEndianType == "Little-endian Byte Swap")
+                        {
+                            _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Unsigned32, EndianType.LittleEndianByteSwap);
+                        }
+                    }
+                    else if(parentMenuText == "64-bit Signed")
                     {
-                        _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Signed64, selectedEndianType);
+                        if (selectedEndianType == "Big-endian")
+                        {
+                            _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Signed64, EndianType.BigEndian);
+                        }
+                        else if (selectedEndianType == "Little-endian")
+                        {
+                            _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Signed64, EndianType.LittleEndian);
+                        }
+                        else if (selectedEndianType == "Big-endian Byte Swap")
+                        {
+                            _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Signed64, EndianType.BigEndianByteSwap);
+                        }
+                        else if (selectedEndianType == "Little-endian Byte Swap")
+                        {
+                            _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Signed64, EndianType.LittleEndianByteSwap);
+                        }
                     }
                     else if (parentMenuText == "64-bit Unsigned")
                     {
-                        _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Unsigned64, selectedEndianType);
+                        if (selectedEndianType == "Big-endian")
+                        {
+                            _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Unsigned64, EndianType.BigEndian);
+                        }
+                        else if (selectedEndianType == "Little-endian")
+                        {
+                            _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Unsigned64, EndianType.LittleEndian);
+                        }
+                        else if (selectedEndianType == "Big-endian Byte Swap")
+                        {
+                            _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Unsigned64, EndianType.BigEndianByteSwap);
+                        }
+                        else if (selectedEndianType == "Little-endian Byte Swap")
+                        {
+                            _dataViewService.UpdateCellData(_rowIndex, _columnIndex, DataType.Unsigned64, EndianType.LittleEndianByteSwap);
+                        }
                     }
                 }
                 else

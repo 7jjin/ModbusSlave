@@ -10,13 +10,15 @@ namespace ModbusSlave.Models
     {
         public int RowIndex { get; set; }
         public DataType Type { get; set; }
+        public EndianType EndianType { get; set; }
         public object Value { get; set; }
 
         
 
-        public CellData(int rowIndex, DataType type, object value)
+        public CellData(int rowIndex, DataType type, object value, EndianType endianType)
         {
             Type = type;
+            EndianType = endianType;
             Value = value;
             RowIndex = rowIndex;  
         }

@@ -20,13 +20,15 @@ namespace ModbusSlave
         private IModbusConnection _modbusConnection;
         public object InputValue { get; private set; }
         private DataType _dataType;
+        private EndianType _endianType;
         private ushort _startAddress;
-        public Form2(DataType dataType, ushort address, IModbusConnection modbusConnection)
+        public Form2(DataType dataType, ushort address, IModbusConnection modbusConnection,EndianType endianType)
         {
             InitializeComponent();
             _dataType = dataType;
+            _endianType = endianType;
             _startAddress = address;
-            this.Text = $"Enter {dataType}";
+            this.Text = $"Enter {dataType} {endianType}";
             _modbusConnection = modbusConnection;
            
             btnOk.Click += async (s, e) =>
@@ -51,14 +53,141 @@ namespace ModbusSlave
         private async Task SendDataToModbusMasterAsync()
         {
             // DataType에 따라 데이터를 ushort로 변환
-            ushort valueToSend = ConvertToUshort(_dataType, InputValue.ToString());
+            ushort[] valuesToSend = ConvertToUshortArray(_dataType, InputValue.ToString(), _endianType);
             _startAddress -= 40001;
 
-            // 시작 주소 및 Modbus 연결을 위한 접근 (여기서는 startAddress를 e.RowIndex로 가정)
-            await _modbusConnection.WriteHoldingRegistersAsync(_startAddress, new ushort[] { valueToSend });
+
+            await _modbusConnection.WriteHoldingRegistersAsync(_startAddress, valuesToSend);
         }
 
-        private ushort ConvertToUshort(DataType dataType, string inputValue)
+        /// <summary>
+        /// DataType과 EndianType에 맞춰 배열을 만들어 전달하는 함수
+        /// </summary>
+        /// <param name="dataType"></param>
+        /// <param name="inputValue"></param>
+        /// <param name="endianType"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        // 32비트 및 64비트 데이터를 ushort 배열로 변환
+        private ushort[] ConvertToUshortArray(DataType dataType, string inputValue, EndianType endianType)
+        {
+            switch (dataType)
+            {
+                case DataType.Signed32:
+                    int signed32Value = Int32.Parse(inputValue);
+                    return ConvertSigned32BitToUshortArray(signed32Value, endianType);
+
+                //case DataType.Unsigned32:
+                //    uint unsigned32Value = UInt32.Parse(inputValue);
+                //    return ConvertUnsigned32BitToUshortArray(unsigned32Value, endianType);
+
+                //case DataType.Signed64:
+                //    long signed64Value = long.Parse(inputValue);
+                //    return ConvertSigned64BitToUshortArray(signed64Value, endianType);
+
+                //case DataType.Unsigned64:
+                //    ulong unsigned64Value = ulong.Parse(inputValue);
+                //    return ConvertUnsigned64BitToUshortArray(unsigned64Value, endianType);
+
+                default:
+                    return new[] { ConvertToUshort(dataType, inputValue, endianType) };
+            }
+        }
+
+        private ushort[] ConvertSigned32BitToUshortArray(int value, EndianType endianType)
+        {
+            switch (endianType)
+            {
+                case EndianType.BigEndian:
+                    // 32bit 정수를 Big-endian 형식의 바이트 배열로 변환
+                    byte[] bigEndian = BitConverter.GetBytes(value);
+
+                    // 시스템이 Little-endian인 경우 Big-endian 순서를 맞추기 위해 바이트 순서를 뒤집음
+                    if (BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(bigEndian);
+                    }
+
+                    // 상위 16비트와 하위 16비트를 그대로 추출
+                    ushort[] result = new ushort[2];
+                    result[0] = (ushort)((bigEndian[0] << 8) | bigEndian[1]); // 상위 16비트
+                    result[1] = (ushort)((bigEndian[2] << 8) | bigEndian[3]); // 하위 16비트
+
+                    return result;
+                case EndianType.LittleEndian:
+                    byte[] littleEndian = BitConverter.GetBytes(value);
+
+                    // 상위 16비트와 하위 16비트를 Little-endian 형식으로 추출
+                    return new ushort[]
+                    {
+                (ushort)((littleEndian[0] << 8) | littleEndian[1]), // 하위 16비트
+                (ushort)((littleEndian[2] << 8) | littleEndian[3])  // 상위 16비트
+                    };
+                case EndianType.BigEndianByteSwap:
+                    byte[] bigEndianByteSwap = BitConverter.GetBytes(value);
+
+                    // 상위 16비트와 하위 16비트를 Little-endian 형식으로 추출
+                    return new ushort[]
+                    {
+                (ushort)((bigEndianByteSwap[2] << 8) | bigEndianByteSwap[3]), // 하위 16비트
+                (ushort)((bigEndianByteSwap[0] << 8) | bigEndianByteSwap[1])  // 상위 16비트
+                    };
+                case EndianType.LittleEndianByteSwap:
+                    // value를 32비트 unsigned로 처리
+                    uint swappedValue = unchecked((uint)value);
+
+                    // 상위 16비트와 하위 16비트를 추출
+                    ushort upperValue = (ushort)(swappedValue & 0xFFFF);           // 하위 16비트
+                    ushort lowerValue = (ushort)((swappedValue >> 16) & 0xFFFF);   // 상위 16비트
+
+                    // Little-endian Byte Swap 유지
+                    return new ushort[] { upperValue, lowerValue };
+                default:
+                    throw new ArgumentException("Unsupported EndianType");
+            }
+        }
+
+        private ushort[] ConvertSigned32BitToBigEndianParts(int value)
+        {
+            // 32bit 정수를 Big-endian 형식의 바이트 배열로 변환
+            byte[] bytes = BitConverter.GetBytes(value);
+
+            // 시스템이 Little-endian인 경우 Big-endian 순서를 맞추기 위해 바이트 순서를 뒤집음
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
+
+            // 상위 16비트와 하위 16비트를 그대로 추출
+            ushort[] result = new ushort[2];
+            result[0] = (ushort)((bytes[0] << 8) | bytes[1]); // 상위 16비트
+            result[1] = (ushort)((bytes[2] << 8) | bytes[3]); // 하위 16비트
+
+            return result;
+        }
+
+        // Long 값을 Endian 방식에 따라 ushort 배열로 변환
+        private ushort[] ConvertLongToUshortArray(long value, int byteSize, EndianType endianType)
+        {
+            byte[] bytes = BitConverter.GetBytes(value);
+
+            if ((BitConverter.IsLittleEndian && endianType == EndianType.BigEndian) ||
+                (!BitConverter.IsLittleEndian && endianType == EndianType.LittleEndian))
+            {
+                Array.Reverse(bytes);
+            }
+
+            // ushort로 2바이트씩 분리
+            ushort[] result = new ushort[bytes.Length/ 2];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = BitConverter.ToUInt16(bytes, i * 2);
+            }
+
+            return result;
+        }
+
+        private ushort ConvertToUshort(DataType dataType, string inputValue,EndianType endianType)
         {
             ushort result;
             switch (dataType)
@@ -109,6 +238,11 @@ namespace ModbusSlave
             }
         }
 
+        /// <summary>
+        /// 데이터 타입에 따른 유효성 검사 확인 함수
+        /// </summary>
+        /// <param name="dataType"></param>
+        /// <returns></returns>
         private bool ValidateInput(DataType dataType)
         {
             int value;
@@ -220,19 +354,11 @@ namespace ModbusSlave
             return true;
         }
 
-        // 확인 버튼 클릭 시 값 저장
-        private void btnOk_Click(object sender, EventArgs e)
-        {
-            // 데이터 타입에 맞는 입력값 처리
-            // 유효성 검사 후 InputValue에 저장
-            this.DialogResult = DialogResult.OK;
-            this.Close();
-        }
 
         private void TextBox_KeyPress_NumericOnly(object sender, KeyPressEventArgs e)
         {
             // Signed 값일 때는 "-"도 허용
-            if (_dataType == DataType.Signed && e.KeyChar == '-' && txt_Value.Text.Length == 0)
+            if ((_dataType == DataType.Signed || _dataType == DataType.Signed32 || _dataType == DataType.Signed64) && e.KeyChar == '-' && txt_Value.Text.Length == 0)
             {
                 // 첫 번째 문자로만 "-" 허용
                 e.Handled = false;
