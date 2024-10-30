@@ -9,7 +9,7 @@ namespace ModbusSlave.Interfaces
 {
     public interface IModbusConnection
     {
-        void Connect();
+        void Connect(int slaveId);
         Task<ushort[]> ReadHoldingRegistersAsync(ushort startAddress, ushort quantity);
         Task WriteHoldingRegistersAsync(ushort startAddress, ushort[] values);
     }

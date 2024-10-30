@@ -44,6 +44,9 @@
             this.lbl_ReadTest = new System.Windows.Forms.Label();
             this.btnReadData = new System.Windows.Forms.Button();
             this.dataView = new System.Windows.Forms.DataGridView();
+            this.lbl_SlaveId = new System.Windows.Forms.Label();
+            this.txt_SlaveId = new System.Windows.Forms.TextBox();
+            this.btn_Connect = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -199,11 +202,42 @@
             this.dataView.Size = new System.Drawing.Size(343, 365);
             this.dataView.TabIndex = 25;
             // 
+            // lbl_SlaveId
+            // 
+            this.lbl_SlaveId.AutoSize = true;
+            this.lbl_SlaveId.Location = new System.Drawing.Point(444, 331);
+            this.lbl_SlaveId.Name = "lbl_SlaveId";
+            this.lbl_SlaveId.Size = new System.Drawing.Size(78, 19);
+            this.lbl_SlaveId.TabIndex = 44;
+            this.lbl_SlaveId.Text = "Slave ID";
+            // 
+            // txt_SlaveId
+            // 
+            this.txt_SlaveId.Location = new System.Drawing.Point(521, 328);
+            this.txt_SlaveId.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.txt_SlaveId.Name = "txt_SlaveId";
+            this.txt_SlaveId.Size = new System.Drawing.Size(85, 25);
+            this.txt_SlaveId.TabIndex = 45;
+            // 
+            // btn_Connect
+            // 
+            this.btn_Connect.Location = new System.Drawing.Point(626, 328);
+            this.btn_Connect.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btn_Connect.Name = "btn_Connect";
+            this.btn_Connect.Size = new System.Drawing.Size(98, 28);
+            this.btn_Connect.TabIndex = 46;
+            this.btn_Connect.Text = "Connection";
+            this.btn_Connect.UseVisualStyleBackColor = true;
+            this.btn_Connect.Click += new System.EventHandler(this.btn_Connect_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(972, 441);
+            this.Controls.Add(this.btn_Connect);
+            this.Controls.Add(this.txt_SlaveId);
+            this.Controls.Add(this.lbl_SlaveId);
             this.Controls.Add(this.lbl_WritePlcAddress);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.lbl_ReadPlcAddress);
@@ -247,6 +281,9 @@
         private System.Windows.Forms.Label lbl_ReadTest;
         private System.Windows.Forms.Button btnReadData;
         private System.Windows.Forms.DataGridView dataView;
+        private System.Windows.Forms.Label lbl_SlaveId;
+        private System.Windows.Forms.TextBox txt_SlaveId;
+        private System.Windows.Forms.Button btn_Connect;
     }
 }
 

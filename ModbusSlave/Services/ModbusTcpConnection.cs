@@ -30,7 +30,7 @@ namespace ModbusSlave.Services
             _dataStore = new DefaultSlaveDataStore();
         }
 
-        public void Connect()
+        public void Connect(int slaveId)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace ModbusSlave.Services
                 var factory = new ModbusFactory();
 
                 // Slave ID 1을 가진 Slave 생성
-                _slave = factory.CreateSlave(1, _dataStore);
+                _slave = factory.CreateSlave((byte)slaveId, _dataStore);
 
                 // Modbus Slave 네트워크 생성 및 Slave 추가
                 _slaveNetwork = factory.CreateSlaveNetwork(_tcpListener);
@@ -47,7 +47,7 @@ namespace ModbusSlave.Services
                 // 비동기적으로 요청을 처리하도록 설정
                 Task.Run(async () => await _slaveNetwork.ListenAsync());
 
-                Console.WriteLine("Modbus Slave started...");
+                MessageBox.Show("접속을 시작합니다.");
             }
             catch (Exception ex)
             {

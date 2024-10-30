@@ -28,10 +28,16 @@ namespace ModbusSlave
             _dataViewService = dataViewService;
             _contextMenuService = contextMenuService;
 
-            _modbusConnection.Connect();
+            
             dataView.MouseDown += DataView_MouseDown;
             txt_ReadAddress.TextChanged += Txt_ReadAddress_TextChanged;
             txt_WriteAddress.TextChanged += Txt_WriteAddress_TextChanged;
+        }
+
+        private void btn_Connect_Click(object sender, EventArgs e)
+        {
+            int slaveId = int.Parse(txt_SlaveId.Text);
+            _modbusConnection.Connect(slaveId);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -160,5 +166,7 @@ namespace ModbusSlave
                 MessageBox.Show($"Failed to read data: {ex.Message}");
             }
         }
+
+        
     }
 }
