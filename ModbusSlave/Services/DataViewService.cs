@@ -134,12 +134,11 @@ namespace ModbusSlave.Services
                 // selectedType = 클릭 한 타입
                 if(endianType == EndianType.none)
                 {
-                    // 비동기 메서드 내에서 사용해야 함 (예: async Task 메서드 안에서)
+                    // 레지스트리에서 값을 가져온다
                     ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 1);
-                    // 16 bit로 바꿀 때 (Endian 형식이 없는 것으로 바꿀 때)
+                    // 16bit Signed 선택
                     if (selectedType == DataType.Signed)
                     {
-                        // 배열로 반환되므로 첫 번째 값에 접근
                         int signedValue = ConvertToSigned(registerValues[0].ToString());
                         if (signedValue > 32767)
                         {
@@ -149,25 +148,31 @@ namespace ModbusSlave.Services
                         {
                             firstCellData.Value = signedValue.ToString();
                         }
-                    }else if(selectedType == DataType.Unsigned)
+                    }
+                    // 16it Unsigned 선택
+                    else if(selectedType == DataType.Unsigned)
                     {
                         ushort unsignedValue = ConvertToUnsigned16(registerValues[0].ToString());
                         firstCellData.Value = unsignedValue.ToString();
-                    }else if(selectedType == DataType.Hex)
+                    }
+                     // 16bit Hex 선택
+                    else if(selectedType == DataType.Hex)
                     {
                         int value = ConvertToUnsigned16(registerValues[0].ToString());
                         firstCellData.Value = $"0x{value:X4}";
-                    }else if(selectedType == DataType.Binary)
+                    }
+                    // 16bit Binary 선택
+                    else if(selectedType == DataType.Binary)
                     {
                         int binaryValue = ConvertToSigned(registerValues[0].ToString());
                         string binaryString = binaryValue < 0 ? Convert.ToString((ushort)binaryValue, 2).PadLeft(15, '0') : Convert.ToString(binaryValue, 2).PadLeft(16, '0');
                         firstCellData.Value = binaryString;
                     }
-                    
-
                 }
+                // 32bit, 64bit Big-Endian을 선택
                 else if(endianType == EndianType.BigEndian)
                 {
+                    // 32bit Signed Big-endian을 선택
                     if(selectedType == DataType.Signed32)
                     {
                         ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 2);
@@ -175,23 +180,27 @@ namespace ModbusSlave.Services
                         ushort upperValue = ConvertToUnsigned16(registerValues[0].ToString());
                         ushort lowerValue = ConvertToUnsigned16(registerValues[1].ToString());
 
-                        // Big-endian으로 변환
+                        
                         uint bigEndianValue = ((uint)upperValue << 16) | lowerValue;
 
                         // 32bit signed로 변환 (부호 있는 값을 처리)
                         int result = unchecked((int)bigEndianValue);
                         firstCellData.Value = result.ToString();
-                    }else if(selectedType == DataType.Unsigned32)
+                    }
+                    // 32bit Unsigned Big-endian을 선택
+                    else if (selectedType == DataType.Unsigned32)
                     {
                         ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 2);
-                        // 두 셀의 값을 16-bit로 읽어와 결합
+                        
                         ushort upperValue = ConvertToUnsigned16(registerValues[0].ToString());
                         ushort lowerValue = ConvertToUnsigned16(registerValues[1].ToString());
 
                         // Big-endian으로 변환
                         ulong bigEndianValue = ((ulong)upperValue << 16) | lowerValue;
                         firstCellData.Value = bigEndianValue.ToString();
-                    }else if(selectedType == DataType.Signed64)
+                    }
+                    // 64bit Signed Big-endian을 선택
+                    else if(selectedType == DataType.Signed64)
                     {
                         ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 4);
                         uint upperValue = ConvertTo32BitBigEndian(registerValues[0].ToString(), registerValues[1].ToString(), registerValues[2].ToString(), registerValues[3].ToString());
@@ -206,7 +215,9 @@ namespace ModbusSlave.Services
                         }
 
                         firstCellData.Value = (long)bigEndianValue;
-                    }else if(selectedType == DataType.Unsigned64)
+                    }
+                    // 64bit Unsigned Big-endian을 선택
+                    else if(selectedType == DataType.Unsigned64)
                     {
                         ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 4);
                         uint upperValue = ConvertTo32BitBigEndianUnsigned(registerValues[0].ToString(), registerValues[1].ToString(), registerValues[2].ToString(), registerValues[3].ToString());
@@ -214,8 +225,11 @@ namespace ModbusSlave.Services
 
                         firstCellData.Value = ((ulong)upperValue << 32) | lowerValue;
                     }
-                }else if(endianType == EndianType.LittleEndian)
+                }
+                // 32bit, 64bit Little-Endian을 선택
+                else if(endianType == EndianType.LittleEndian)
                 {
+                    // 32bit Signed Little-endian을 선택
                     if (selectedType == DataType.Signed32)
                     {
                         ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 2);
@@ -232,7 +246,9 @@ namespace ModbusSlave.Services
                         // 32bit signed로 변환 (부호 있는 값을 처리)
                         int result = unchecked((int)littleEndianValue);
                         firstCellData.Value = result.ToString();
-                    }else if(selectedType == DataType.Unsigned32)
+                    }
+                    // 32bit Unsigned Little-endian을 선택
+                    else if(selectedType == DataType.Unsigned32)
                     {
                         ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 2);
                         ushort upperValue = ConvertToUnsigned16(registerValues[0].ToString());
@@ -245,7 +261,9 @@ namespace ModbusSlave.Services
                         // Little-endian으로 변환 (값 순서 반대로)
                         ulong littleEndianValue = ((ulong)reversedLower << 16) | reversedUpper;
                         firstCellData.Value = littleEndianValue.ToString();
-                    }else if(selectedType == DataType.Signed64)
+                    }
+                    // 64bit Signed Little-endian을 선택
+                    else if(selectedType == DataType.Signed64)
                     {
                         ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 4);
                         uint upperValue = ConvertTo32BitLittleEndian(registerValues[0].ToString(), registerValues[1].ToString(), registerValues[2].ToString(), registerValues[3].ToString());
@@ -259,7 +277,9 @@ namespace ModbusSlave.Services
                         }
 
                         firstCellData.Value =  (long)littleEndianValue;
-                    }else if(selectedType == DataType.Unsigned64)
+                    }
+                    // 64bit Unsigned Little-endian을 선택
+                    else if(selectedType == DataType.Unsigned64)
                     {
                         ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 4);
                         uint upperValue = ConvertTo32BitLittleEndian(registerValues[0].ToString(), registerValues[1].ToString(), registerValues[2].ToString(), registerValues[3].ToString());
@@ -268,8 +288,11 @@ namespace ModbusSlave.Services
 
                         firstCellData.Value = littleEndianValue;
                     }
-                }else if(endianType == EndianType.BigEndianByteSwap)
+                }
+                // 32bit, 64bit Big-Endian Byte Swap을 선택
+                else if(endianType == EndianType.BigEndianByteSwap)
                 {
+                    // 32bit Signed Big-endian Byte Swap을 선택
                     if(selectedType == DataType.Signed32)
                     {
                         ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 2);
@@ -288,7 +311,9 @@ namespace ModbusSlave.Services
 
                         int result = unchecked((int)swappedValue);
                         firstCellData.Value = result;
-                    }else if(selectedType == DataType.Unsigned32)
+                    }
+                    // 32bit Unsigned Big-endian Byte Swap을 선택
+                    else if(selectedType == DataType.Unsigned32)
                     {
                         ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 2);
                         ushort upperValue = ConvertToUnsigned16(registerValues[0].ToString());
@@ -305,7 +330,9 @@ namespace ModbusSlave.Services
 
                         // Unsigned 값으로 반환
                         firstCellData.Value =  (ulong)swappedValue;  // 결과 값 반환
-                    }else if(selectedType == DataType.Signed64)
+                    }
+                    // 64bit Signed Big-endian Byte Swap을 선택
+                    else if(selectedType == DataType.Signed64)
                     {
                         ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 4);
                         uint upperValue = ConvertTo32BitBigEndian(registerValues[0].ToString(), registerValues[1].ToString(), registerValues[2].ToString(), registerValues[3].ToString());
@@ -329,7 +356,9 @@ namespace ModbusSlave.Services
                         }
 
                         firstCellData.Value = (long)swappedValue;
-                    }else if(selectedType == DataType.Unsigned64)
+                    }
+                    // 64bit Unsigned Big-endian Byte Swap을 선택
+                    else if(selectedType == DataType.Unsigned64)
                     {
                         ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 4);
                         uint upperValue = ConvertTo32BitBigEndian(registerValues[0].ToString(), registerValues[1].ToString(), registerValues[2].ToString(), registerValues[3].ToString());
@@ -348,8 +377,11 @@ namespace ModbusSlave.Services
 
                         firstCellData.Value = swappedValue;
                     }
-                }else if(endianType == EndianType.LittleEndianByteSwap)
+                }
+                // 32bit, 64bit Little-Endian Byte Swap을 선택
+                else if(endianType == EndianType.LittleEndianByteSwap)
                 {
+                    // 32bit Signed Little-endian Byte Swap을 선택
                     if(selectedType == DataType.Signed32)
                     {
                         ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 2);
@@ -369,7 +401,9 @@ namespace ModbusSlave.Services
 
                         int result = unchecked((int)swappedValue);
                         firstCellData.Value = result;  // 결과 값 반환
-                    }else if(selectedType == DataType.Unsigned32)
+                    }
+                    // 32bit Unsigned Little-endian Byte Swap을 선택
+                    else if(selectedType == DataType.Unsigned32)
                     {
                         ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 2);
                         ushort upperValue = ConvertToUnsigned16(registerValues[0].ToString());
@@ -386,7 +420,9 @@ namespace ModbusSlave.Services
                                      ((littleEndianValue & 0x0000FF00) >> 8) |  // 세 번째 상위 8비트 -> 하위 8비트로 이동
                                      ((littleEndianValue & 0x000000FF) << 8);    // 하위 8비트 -> 세 번째 상위 8비트로 이동
                         firstCellData.Value = (ulong)swappedValue;
-                    }else if(selectedType == DataType.Signed64)
+                    }
+                    // 64bit Signed Little-endian Byte Swap을 선택
+                    else if(selectedType == DataType.Signed64)
                     {
                         ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 4);
                         uint upperValue = ConvertTo32BitLittleEndian(registerValues[0].ToString(), registerValues[1].ToString(), registerValues[2].ToString(), registerValues[3].ToString());
@@ -410,7 +446,9 @@ namespace ModbusSlave.Services
                         }
 
                         firstCellData.Value = (long)swappedValue;
-                    }else if(selectedType == DataType.Unsigned64)
+                    }
+                    // 64bit Unsigned Little-endian Byte Swap을 선택
+                    else if(selectedType == DataType.Unsigned64)
                     {
                         ushort[] registerValues = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, 4);
                         uint upperValue = ConvertTo32BitLittleEndian(registerValues[0].ToString(), registerValues[1].ToString(), registerValues[2].ToString(), registerValues[3].ToString());
