@@ -33,7 +33,7 @@ namespace ModbusSlave.Services
             dataView.Columns.Add("Column2", "00000"); // "00000" 헤더
 
             // 11개의 행 추가 (0~9번 인덱스, 총 10개)
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i <= 9; i++)
             {
                 dataView.Rows.Add();
                 _cellDataList.Add(new CellData(i,DataType.Signed, 0,EndianType.none));    //초기값 Signed, 0 으로 설정
@@ -72,9 +72,9 @@ namespace ModbusSlave.Services
                     ushort startAddress = (ushort)(headerValue + cellValue);
 
                     // 두 번째 열이 클릭된 경우에만 Form2를 연다.
-                    if (e.ColumnIndex == 1) // 예를 들어, 두 번째 열이 데이터 입력 열이라고 가정
+                    if (e.ColumnIndex == 1) 
                     {
-                        Form2 dataInputForm = new Form2(_cellDataList[e.RowIndex].Type, startAddress, _modbusConnection, _cellDataList[e.RowIndex].EndianType);
+                        Form2 dataInputForm = new Form2(_cellDataList[e.RowIndex].Type, startAddress, _modbusConnection, _cellDataList[e.RowIndex].EndianType, e.RowIndex);
                         if (dataInputForm.ShowDialog() == DialogResult.OK)
                         {
                             _cellDataList[e.RowIndex].Value = dataInputForm.InputValue;
@@ -172,6 +172,7 @@ namespace ModbusSlave.Services
                 // 32bit, 64bit Big-Endian을 선택
                 else if(endianType == EndianType.BigEndian)
                 {
+                        
                     // 32bit Signed Big-endian을 선택
                     if(selectedType == DataType.Signed32)
                     {
@@ -186,6 +187,7 @@ namespace ModbusSlave.Services
                         // 32bit signed로 변환 (부호 있는 값을 처리)
                         int result = unchecked((int)bigEndianValue);
                         firstCellData.Value = result.ToString();
+                        _dataView.Rows[rowIndex + 1].Cells[1].Value = "-";
                     }
                     // 32bit Unsigned Big-endian을 선택
                     else if (selectedType == DataType.Unsigned32)
@@ -198,6 +200,7 @@ namespace ModbusSlave.Services
                         // Big-endian으로 변환
                         ulong bigEndianValue = ((ulong)upperValue << 16) | lowerValue;
                         firstCellData.Value = bigEndianValue.ToString();
+                        _dataView.Rows[rowIndex + 1].Cells[1].Value = "-";
                     }
                     // 64bit Signed Big-endian을 선택
                     else if(selectedType == DataType.Signed64)
@@ -215,6 +218,16 @@ namespace ModbusSlave.Services
                         }
 
                         firstCellData.Value = (long)bigEndianValue;
+                        if(rowIndex >= 7)
+                        {
+                            for(int i=rowIndex+1;i<10; i++)
+                            {
+                                _dataView.Rows[i].Cells[1].Value = "-";
+                            }
+                        }
+                        _dataView.Rows[rowIndex + 1].Cells[1].Value = "-";
+                        _dataView.Rows[rowIndex + 2].Cells[1].Value = "-";
+                        _dataView.Rows[rowIndex + 3].Cells[1].Value = "-";
                     }
                     // 64bit Unsigned Big-endian을 선택
                     else if(selectedType == DataType.Unsigned64)
@@ -224,6 +237,16 @@ namespace ModbusSlave.Services
                         uint lowerValue = ConvertTo32BitBigEndianUnsigned(registerValues[2].ToString(), registerValues[3].ToString(), registerValues[0].ToString(), registerValues[1].ToString());
 
                         firstCellData.Value = ((ulong)upperValue << 32) | lowerValue;
+                        if (rowIndex >= 7)
+                        {
+                            for (int i = rowIndex + 1; i < 10; i++)
+                            {
+                                _dataView.Rows[i].Cells[1].Value = "-";
+                            }
+                        }
+                        _dataView.Rows[rowIndex + 1].Cells[1].Value = "-";
+                        _dataView.Rows[rowIndex + 2].Cells[1].Value = "-";
+                        _dataView.Rows[rowIndex + 3].Cells[1].Value = "-";
                     }
                 }
                 // 32bit, 64bit Little-Endian을 선택
@@ -246,6 +269,7 @@ namespace ModbusSlave.Services
                         // 32bit signed로 변환 (부호 있는 값을 처리)
                         int result = unchecked((int)littleEndianValue);
                         firstCellData.Value = result.ToString();
+                        _dataView.Rows[rowIndex + 1].Cells[1].Value = "-";
                     }
                     // 32bit Unsigned Little-endian을 선택
                     else if(selectedType == DataType.Unsigned32)
@@ -261,6 +285,7 @@ namespace ModbusSlave.Services
                         // Little-endian으로 변환 (값 순서 반대로)
                         ulong littleEndianValue = ((ulong)reversedLower << 16) | reversedUpper;
                         firstCellData.Value = littleEndianValue.ToString();
+                        _dataView.Rows[rowIndex + 1].Cells[1].Value = "-";
                     }
                     // 64bit Signed Little-endian을 선택
                     else if(selectedType == DataType.Signed64)
@@ -277,6 +302,16 @@ namespace ModbusSlave.Services
                         }
 
                         firstCellData.Value =  (long)littleEndianValue;
+                        if (rowIndex >= 7)
+                        {
+                            for (int i = rowIndex + 1; i < 10; i++)
+                            {
+                                _dataView.Rows[i].Cells[1].Value = "-";
+                            }
+                        }
+                        _dataView.Rows[rowIndex + 1].Cells[1].Value = "-";
+                        _dataView.Rows[rowIndex + 2].Cells[1].Value = "-";
+                        _dataView.Rows[rowIndex + 3].Cells[1].Value = "-";
                     }
                     // 64bit Unsigned Little-endian을 선택
                     else if(selectedType == DataType.Unsigned64)
@@ -287,6 +322,16 @@ namespace ModbusSlave.Services
                         ulong littleEndianValue = ((ulong)lowerValue << 32) | upperValue;
 
                         firstCellData.Value = littleEndianValue;
+                        if (rowIndex >= 7)
+                        {
+                            for (int i = rowIndex + 1; i < 10; i++)
+                            {
+                                _dataView.Rows[i].Cells[1].Value = "-";
+                            }
+                        }
+                        _dataView.Rows[rowIndex + 1].Cells[1].Value = "-";
+                        _dataView.Rows[rowIndex + 2].Cells[1].Value = "-";
+                        _dataView.Rows[rowIndex + 3].Cells[1].Value = "-";
                     }
                 }
                 // 32bit, 64bit Big-Endian Byte Swap을 선택
@@ -311,6 +356,7 @@ namespace ModbusSlave.Services
 
                         int result = unchecked((int)swappedValue);
                         firstCellData.Value = result;
+                        _dataView.Rows[rowIndex + 1].Cells[1].Value = "-";
                     }
                     // 32bit Unsigned Big-endian Byte Swap을 선택
                     else if(selectedType == DataType.Unsigned32)
@@ -330,6 +376,7 @@ namespace ModbusSlave.Services
 
                         // Unsigned 값으로 반환
                         firstCellData.Value =  (ulong)swappedValue;  // 결과 값 반환
+                        _dataView.Rows[rowIndex + 1].Cells[1].Value = "-";
                     }
                     // 64bit Signed Big-endian Byte Swap을 선택
                     else if(selectedType == DataType.Signed64)
@@ -356,6 +403,16 @@ namespace ModbusSlave.Services
                         }
 
                         firstCellData.Value = (long)swappedValue;
+                        if (rowIndex >= 7)
+                        {
+                            for (int i = rowIndex + 1; i < 10; i++)
+                            {
+                                _dataView.Rows[i].Cells[1].Value = "-";
+                            }
+                        }
+                        _dataView.Rows[rowIndex + 1].Cells[1].Value = "-";
+                        _dataView.Rows[rowIndex + 2].Cells[1].Value = "-";
+                        _dataView.Rows[rowIndex + 3].Cells[1].Value = "-";
                     }
                     // 64bit Unsigned Big-endian Byte Swap을 선택
                     else if(selectedType == DataType.Unsigned64)
@@ -376,6 +433,16 @@ namespace ModbusSlave.Services
                                              ((bigEndianValue & 0x00000000000000FF) << 8);
 
                         firstCellData.Value = swappedValue;
+                        if (rowIndex >= 7)
+                        {
+                            for (int i = rowIndex + 1; i < 10; i++)
+                            {
+                                _dataView.Rows[i].Cells[1].Value = "-";
+                            }
+                        }
+                        _dataView.Rows[rowIndex + 1].Cells[1].Value = "-";
+                        _dataView.Rows[rowIndex + 2].Cells[1].Value = "-";
+                        _dataView.Rows[rowIndex + 3].Cells[1].Value = "-";
                     }
                 }
                 // 32bit, 64bit Little-Endian Byte Swap을 선택
@@ -401,6 +468,7 @@ namespace ModbusSlave.Services
 
                         int result = unchecked((int)swappedValue);
                         firstCellData.Value = result;  // 결과 값 반환
+                        _dataView.Rows[rowIndex + 1].Cells[1].Value = "-";
                     }
                     // 32bit Unsigned Little-endian Byte Swap을 선택
                     else if(selectedType == DataType.Unsigned32)
@@ -420,6 +488,7 @@ namespace ModbusSlave.Services
                                      ((littleEndianValue & 0x0000FF00) >> 8) |  // 세 번째 상위 8비트 -> 하위 8비트로 이동
                                      ((littleEndianValue & 0x000000FF) << 8);    // 하위 8비트 -> 세 번째 상위 8비트로 이동
                         firstCellData.Value = (ulong)swappedValue;
+                        _dataView.Rows[rowIndex + 1].Cells[1].Value = "-";
                     }
                     // 64bit Signed Little-endian Byte Swap을 선택
                     else if(selectedType == DataType.Signed64)
@@ -446,6 +515,16 @@ namespace ModbusSlave.Services
                         }
 
                         firstCellData.Value = (long)swappedValue;
+                        if (rowIndex >= 7)
+                        {
+                            for (int i = rowIndex + 1; i < 10; i++)
+                            {
+                                _dataView.Rows[i].Cells[1].Value = "-";
+                            }
+                        }
+                        _dataView.Rows[rowIndex + 1].Cells[1].Value = "-";
+                        _dataView.Rows[rowIndex + 2].Cells[1].Value = "-";
+                        _dataView.Rows[rowIndex + 3].Cells[1].Value = "-";
                     }
                     // 64bit Unsigned Little-endian Byte Swap을 선택
                     else if(selectedType == DataType.Unsigned64)
@@ -465,6 +544,16 @@ namespace ModbusSlave.Services
                                              ((littleEndianValue & 0x00000000000000FF) << 8);
 
                         firstCellData.Value = swappedValue;
+                        if (rowIndex >= 7)
+                        {
+                            for (int i = rowIndex + 1; i < 10; i++)
+                            {
+                                _dataView.Rows[i].Cells[1].Value = "-";
+                            }
+                        }
+                        _dataView.Rows[rowIndex + 1].Cells[1].Value = "-";
+                        _dataView.Rows[rowIndex + 2].Cells[1].Value = "-";
+                        _dataView.Rows[rowIndex + 3].Cells[1].Value = "-";
                     }
                 }
 

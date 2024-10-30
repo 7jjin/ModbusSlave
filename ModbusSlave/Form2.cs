@@ -22,12 +22,14 @@ namespace ModbusSlave
         private DataType _dataType;
         private EndianType _endianType;
         private ushort _startAddress;
-        public Form2(DataType dataType, ushort address, IModbusConnection modbusConnection,EndianType endianType)
+        private int _rowIndex;
+        public Form2(DataType dataType, ushort address, IModbusConnection modbusConnection,EndianType endianType, int rowIndex)
         {
             InitializeComponent();
             _dataType = dataType;
             _endianType = endianType;
             _startAddress = address;
+            _rowIndex = rowIndex;
             this.Text = $"Enter {dataType} {endianType}";
             _modbusConnection = modbusConnection;
            
