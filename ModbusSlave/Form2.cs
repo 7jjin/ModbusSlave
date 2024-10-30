@@ -359,45 +359,7 @@ namespace ModbusSlave
             }
         }
 
-        private ushort[] ConvertSigned32BitToBigEndianParts(int value)
-        {
-            // 32bit 정수를 Big-endian 형식의 바이트 배열로 변환
-            byte[] bytes = BitConverter.GetBytes(value);
-
-            // 시스템이 Little-endian인 경우 Big-endian 순서를 맞추기 위해 바이트 순서를 뒤집음
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(bytes);
-            }
-
-            // 상위 16비트와 하위 16비트를 그대로 추출
-            ushort[] result = new ushort[2];
-            result[0] = (ushort)((bytes[0] << 8) | bytes[1]); // 상위 16비트
-            result[1] = (ushort)((bytes[2] << 8) | bytes[3]); // 하위 16비트
-
-            return result;
-        }
-
-        // Long 값을 Endian 방식에 따라 ushort 배열로 변환
-        private ushort[] ConvertLongToUshortArray(long value, int byteSize, EndianType endianType)
-        {
-            byte[] bytes = BitConverter.GetBytes(value);
-
-            if ((BitConverter.IsLittleEndian && endianType == EndianType.BigEndian) ||
-                (!BitConverter.IsLittleEndian && endianType == EndianType.LittleEndian))
-            {
-                Array.Reverse(bytes);
-            }
-
-            // ushort로 2바이트씩 분리
-            ushort[] result = new ushort[bytes.Length/ 2];
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = BitConverter.ToUInt16(bytes, i * 2);
-            }
-
-            return result;
-        }
+       
 
         private ushort ConvertToUshort(DataType dataType, string inputValue,EndianType endianType)
         {
