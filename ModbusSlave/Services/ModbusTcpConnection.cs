@@ -30,7 +30,7 @@ namespace ModbusSlave.Services
             _dataStore = new DefaultSlaveDataStore();
         }
 
-        public void Connect(int slaveId)
+        public void Connect(string ipAddress, int port, int slaveId)
         {
             try
             {

@@ -31,14 +31,8 @@ namespace ModbusSlave
             
             dataView.MouseDown += DataView_MouseDown;
             txt_ReadAddress.TextChanged += Txt_ReadAddress_TextChanged;
-            txt_WriteAddress.TextChanged += Txt_WriteAddress_TextChanged;
         }
 
-        private void btn_Connect_Click(object sender, EventArgs e)
-        {
-            int slaveId = int.Parse(txt_SlaveId.Text);
-            _modbusConnection.Connect(slaveId);
-        }
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -48,7 +42,6 @@ namespace ModbusSlave
 
             txt_ReadAddress.Text = "0";
             txt_ReadQuantity.Text = "10";
-            txt_WriteAddress.Text = "0";
 
         }
 
@@ -75,28 +68,6 @@ namespace ModbusSlave
             }
         }
 
-        /// <summary>
-        /// WriteAddress 텍스트 박스의 입력값이 바뀔 때마다 PLC Label값도 바뀜
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Txt_WriteAddress_TextChanged(object sender, EventArgs e)
-        {
-            if (ushort.TryParse(txt_WriteAddress.Text, out ushort inputValue))
-            {
-                // 40001을 더한 값 계산
-                int result = inputValue + 40001;
-
-                // 계산 결과를 Label에 표시
-                lbl_WritePlcAddress.Text = result.ToString();
-                dataView.Columns[1].HeaderText = $"{result}";
-            }
-            else
-            {
-                // 변환이 실패하면 에러 메시지 표시
-                MessageBox.Show("올바른 숫자를 입력하세요.");
-            }
-        }
 
         /// <summary>
         /// DataView 1열 클릭시 ContextMenu 생성
@@ -167,6 +138,8 @@ namespace ModbusSlave
             }
         }
 
-        
+        private void toolStripContainer1_ContentPanel_Load(object sender, EventArgs e)
+        {
+                    }
     }
 }
