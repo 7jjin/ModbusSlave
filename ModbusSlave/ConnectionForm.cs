@@ -36,16 +36,16 @@ namespace ModbusSlave
             string currentTime = DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]");
             try
             {
-
                 _modbusConnection.Connect(ipAddress, port, slaveId);
-
-
+                _form1.IsConnected = true;
+                _form1.LogMessage = $"{currentTime} connected slaveId - {slaveId} {ipAddress} {port}";
 
                 this.Close();
             }
             catch (Exception ex)
             {
-
+                _form1.IsConnected = false;
+                _form1.LogMessage = $"{currentTime} Slave Connection Failed. {ipAddress}:{port}";
             }
         }
 

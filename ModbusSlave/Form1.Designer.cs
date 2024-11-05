@@ -49,6 +49,9 @@
             this.lbl_ReadAddress = new System.Windows.Forms.Label();
             this.panel4 = new System.Windows.Forms.Panel();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.tslbl_status = new System.Windows.Forms.ToolStripStatusLabel();
+            this.stlbl_statusCircle = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tslbl_conectText = new System.Windows.Forms.ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)(this.dataView)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -57,6 +60,7 @@
             this.panel3.SuspendLayout();
             this.gbx_readTest.SuspendLayout();
             this.panel4.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // dataView
@@ -92,8 +96,8 @@
             this.tableLayoutPanel1.RowCount = 4;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 57.38994F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 36.00629F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.761006F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 36.79245F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5.974843F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(490, 665);
             this.tableLayoutPanel1.TabIndex = 47;
             // 
@@ -151,7 +155,7 @@
             // 
             this.connectToolStripMenuItem.Name = "connectToolStripMenuItem";
             this.connectToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F3;
-            this.connectToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.connectToolStripMenuItem.Size = new System.Drawing.Size(191, 26);
             this.connectToolStripMenuItem.Text = "Connect";
             this.connectToolStripMenuItem.Click += new System.EventHandler(this.connectToolStripMenuItem_Click);
             // 
@@ -159,7 +163,7 @@
             // 
             this.disconnectToolStripMenuItem.Name = "disconnectToolStripMenuItem";
             this.disconnectToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F4;
-            this.disconnectToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.disconnectToolStripMenuItem.Size = new System.Drawing.Size(191, 26);
             this.disconnectToolStripMenuItem.Text = "Disconnect";
             this.disconnectToolStripMenuItem.Click += new System.EventHandler(this.disconnectToolStripMenuItem_Click);
             // 
@@ -179,7 +183,7 @@
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel3.Location = new System.Drawing.Point(3, 396);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(484, 222);
+            this.panel3.Size = new System.Drawing.Size(484, 227);
             this.panel3.TabIndex = 2;
             // 
             // gbx_readTest
@@ -265,20 +269,53 @@
             // 
             this.panel4.Controls.Add(this.statusStrip1);
             this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel4.Location = new System.Drawing.Point(3, 624);
+            this.panel4.Location = new System.Drawing.Point(3, 629);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(484, 38);
+            this.panel4.Size = new System.Drawing.Size(484, 33);
             this.panel4.TabIndex = 3;
             // 
             // statusStrip1
             // 
             this.statusStrip1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.statusStrip1.Font = new System.Drawing.Font("맑은 고딕", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tslbl_status,
+            this.stlbl_statusCircle,
+            this.tslbl_conectText});
             this.statusStrip1.Location = new System.Drawing.Point(0, 0);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(484, 38);
+            this.statusStrip1.Size = new System.Drawing.Size(484, 33);
             this.statusStrip1.TabIndex = 0;
             this.statusStrip1.Text = "statusStrip1";
+            // 
+            // tslbl_status
+            // 
+            this.tslbl_status.AutoSize = false;
+            this.tslbl_status.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
+            this.tslbl_status.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this.tslbl_status.Name = "tslbl_status";
+            this.tslbl_status.Size = new System.Drawing.Size(300, 27);
+            this.tslbl_status.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // stlbl_statusCircle
+            // 
+            this.stlbl_statusCircle.AutoSize = false;
+            this.stlbl_statusCircle.BackColor = System.Drawing.Color.Transparent;
+            this.stlbl_statusCircle.Font = new System.Drawing.Font("맑은 고딕", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.stlbl_statusCircle.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.stlbl_statusCircle.Margin = new System.Windows.Forms.Padding(5, 6, 0, 6);
+            this.stlbl_statusCircle.Name = "stlbl_statusCircle";
+            this.stlbl_statusCircle.Size = new System.Drawing.Size(18, 21);
+            this.stlbl_statusCircle.Text = "      ";
+            this.stlbl_statusCircle.Paint += new System.Windows.Forms.PaintEventHandler(this.StatusLabel_Paint);
+            // 
+            // tslbl_conectText
+            // 
+            this.tslbl_conectText.Margin = new System.Windows.Forms.Padding(6, 4, 0, 2);
+            this.tslbl_conectText.Name = "tslbl_conectText";
+            this.tslbl_conectText.Size = new System.Drawing.Size(88, 27);
+            this.tslbl_conectText.Text = "Disconnected";
             // 
             // Form1
             // 
@@ -301,6 +338,8 @@
             this.gbx_readTest.PerformLayout();
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -327,6 +366,9 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label lbl_ReadAddress;
         private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel tslbl_status;
+        private System.Windows.Forms.ToolStripStatusLabel stlbl_statusCircle;
+        private System.Windows.Forms.ToolStripStatusLabel tslbl_conectText;
     }
 }
 

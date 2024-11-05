@@ -56,7 +56,7 @@ namespace ModbusSlave
         {
             // DataType에 따라 데이터를 ushort로 변환
             ushort[] valuesToSend = ConvertToUshortArray(_dataType, InputValue.ToString(), _endianType);
-            // _startAddress -= 40001;
+            _startAddress -= 40001;
              
             await _modbusConnection.WriteHoldingRegistersAsync(_startAddress, valuesToSend);
         }

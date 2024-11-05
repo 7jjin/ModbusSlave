@@ -19,6 +19,17 @@ namespace ModbusSlave
         private IModbusConnection _modbusConnection;
         private readonly IDataViewService _dataViewService;
         private readonly IContextMenuService _contextMenuService;
+        public string LogMessage { get; set; }
+        public bool IsConnected
+        {
+            get => _isConnected;
+            set
+            {
+                _isConnected = value;
+                stlbl_statusCircle.Invalidate();  // 상태 라벨 다시 그리기
+            }
+        }
+        private bool _isConnected;
         public Form1(IModbusConnection modbusConnection, IDataViewService dataViewService, IContextMenuService contextMenuService)
         {
             InitializeComponent();
@@ -31,6 +42,7 @@ namespace ModbusSlave
             
             dataView.MouseDown += DataView_MouseDown;
             txt_ReadAddress.TextChanged += Txt_ReadAddress_TextChanged;
+            stlbl_statusCircle.Paint += StatusLabel_Paint;
         }
 
 
@@ -42,6 +54,42 @@ namespace ModbusSlave
 
             txt_ReadAddress.Text = "0";
             txt_ReadQuantity.Text = "10";
+            IsConnected = false;
+            tslbl_conectText.Text = "Disconnected";
+            LogMessage = "No connection";
+
+            stlbl_statusCircle.Invalidate(); // 초기 상태를 반영하도록 강제로 다시 그리기
+        }
+
+        private void StatusLabel_Paint(object sender, PaintEventArgs e)
+        {
+            Color color = new Color();
+            string currentTime = DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]");
+            if (!IsConnected)
+            {
+                if (IsConnected == false)
+                {
+                    Console.WriteLine("Slave의 연결이 해제되었습니다.");
+                    color = Color.Red;
+                    tslbl_conectText.Text = "Disconnected";
+                    tslbl_status.Text = LogMessage ?? "No connection";
+                }
+            }
+            else
+            {
+                Console.WriteLine("연결을 성공했습니다.");
+                color = Color.Green;
+                tslbl_conectText.Text = "Connected";
+                tslbl_status.Text = LogMessage;
+
+            }
+
+
+            using (SolidBrush brush = new SolidBrush(color))
+            {
+                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias; // 부드럽게 원 그리기
+                e.Graphics.FillEllipse(brush, 0, 0, stlbl_statusCircle.Width - 1, stlbl_statusCircle.Height - 1); // 원 그리기
+            }
 
         }
 
@@ -60,6 +108,7 @@ namespace ModbusSlave
 
                 // 계산 결과를 Label에 표시
                 lbl_ReadPlcAddress.Text = result.ToString();
+                dataView.Columns[1].HeaderText = $"{result}";
             }
             else
             {
@@ -137,10 +186,6 @@ namespace ModbusSlave
                 MessageBox.Show($"Failed to read data: {ex.Message}");
             }
         }
-
-        private void toolStripContainer1_ContentPanel_Load(object sender, EventArgs e)
-        {
-                    }
 
         private void connectToolStripMenuItem_Click(object sender, EventArgs e)
         {
