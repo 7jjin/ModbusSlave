@@ -141,5 +141,16 @@ namespace ModbusSlave
         private void toolStripContainer1_ContentPanel_Load(object sender, EventArgs e)
         {
                     }
+
+        private void connectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ConnectionForm connectionForm = new ConnectionForm(_modbusConnection, this);
+            connectionForm.ShowDialog();
+        }
+
+        private void disconnectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

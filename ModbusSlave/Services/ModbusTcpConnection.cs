@@ -34,6 +34,9 @@ namespace ModbusSlave.Services
         {
             try
             {
+                _tcpListener = new TcpListener(System.Net.IPAddress.Parse("127.0.0.1"), 502);
+                // 기본 데이터 저장소 생성 (Coils, Inputs, Holding Registers, Input Registers)
+                _dataStore = new DefaultSlaveDataStore();
                 _tcpListener.Start();
                 var factory = new ModbusFactory();
 
