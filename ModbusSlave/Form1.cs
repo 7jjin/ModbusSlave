@@ -1,15 +1,6 @@
 ﻿using ModbusSlave.Interfaces;
-using ModbusSlave.Models;
-using ModbusSlave.Services;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ModbusSlave
@@ -19,7 +10,15 @@ namespace ModbusSlave
         private IModbusConnection _modbusConnection;
         private readonly IDataViewService _dataViewService;
         private readonly IContextMenuService _contextMenuService;
-        public string LogMessage { get; set; }
+        public string LogMessage
+        {
+            get => _logMessage;
+            set
+            {
+                _logMessage = value;
+                tslbl_status.Invalidate();
+            }
+        }
         public bool IsConnected
         {
             get => _isConnected;
@@ -29,12 +28,12 @@ namespace ModbusSlave
                 stlbl_statusCircle.Invalidate();  // 상태 라벨 다시 그리기
             }
         }
+        private string _logMessage;
         private bool _isConnected;
         public Form1(IModbusConnection modbusConnection, IDataViewService dataViewService, IContextMenuService contextMenuService)
         {
             InitializeComponent();
             
-            this.Text = "Modbus Slave";
             _modbusConnection = modbusConnection;
             _dataViewService = dataViewService;
             _contextMenuService = contextMenuService;
@@ -142,6 +141,7 @@ namespace ModbusSlave
 
         private async void btnReadData_Click(object sender, EventArgs e)
         {
+            string currentTime = DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]");
             try
             {
                 ushort startAddress;
@@ -159,31 +159,40 @@ namespace ModbusSlave
 
                 ushort[] holdingRegisters = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, quantity);
 
-                for (int i = 0; i < holdingRegisters.Length; i++)
+                if(holdingRegisters != null)
                 {
-                    // 16bit Signed값으로 변경 
-                    if (i < dataView.Rows.Count) 
+                    for (int i = 0; i < holdingRegisters.Length; i++)
                     {
-                        int signedValue = (short)holdingRegisters[i];
-                        string displayValue;
+                        // 16bit Signed값으로 변경 
+                        if (i < dataView.Rows.Count)
+                        {
+                            int signedValue = (short)holdingRegisters[i];
+                            string displayValue;
 
-                        if(signedValue < -32768 || signedValue > 32767)
-                        {
-                            displayValue = holdingRegisters[i].ToString();
+                            if (signedValue < -32768 || signedValue > 32767)
+                            {
+                                displayValue = holdingRegisters[i].ToString();
+                            }
+                            else
+                            {
+                                displayValue = signedValue.ToString();
+                            }
+                            dataView.Rows[i].Cells[1].Value = displayValue;
+                            dataView.AllowUserToAddRows = true;
                         }
-                        else
-                        {
-                            displayValue = signedValue.ToString();
-                        }
-                        dataView.Rows[i].Cells[1].Value = displayValue;
-                        dataView.AllowUserToAddRows = true;
+                        _dataViewService.SetCellsToSigned(holdingRegisters.Length - 1);
+                        LogMessage = $"{currentTime} Read {40001 + startAddress} ~ {40001 + startAddress + quantity} data ";
+                        statusStrip1.Refresh();
                     }
                 }
-                _dataViewService.SetCellsToSigned(holdingRegisters.Length - 1);
+
+                
+                
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to read data: {ex.Message}");
+                LogMessage = $"{currentTime} Failed to read data";
             }
         }
 
@@ -195,7 +204,14 @@ namespace ModbusSlave
 
         private void disconnectToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            _modbusConnection.Disconnect();
+            IsConnected = false;
+            LogMessage = "No connection";
+        }
 
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

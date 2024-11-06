@@ -2,6 +2,7 @@
 using ModbusSlave.Models;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -31,6 +32,13 @@ namespace ModbusSlave.Services
             _dataView = dataView;
             dataView.Columns.Add("Column1", "No");    // "No" 헤더
             dataView.Columns.Add("Column2", "00000"); // "00000" 헤더
+            dataView.EnableHeadersVisualStyles = false;
+
+            dataView.Columns[0].SortMode = DataGridViewColumnSortMode.NotSortable;
+            dataView.Columns[1].SortMode = DataGridViewColumnSortMode.NotSortable;
+
+            dataView.ColumnHeadersDefaultCellStyle.BackColor = Color.LightGray;
+            dataView.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.LightGray;
 
             // 11개의 행 추가 (0~9번 인덱스, 총 10개)
             for (int i = 0; i <= 9; i++)

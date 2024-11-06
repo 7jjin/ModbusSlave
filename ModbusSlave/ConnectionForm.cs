@@ -21,6 +21,9 @@ namespace ModbusSlave
             InitializeComponent();
             _modbusConnection = modbusConnection;
             _form1 = form1;
+            txt_IpAddress.Text = Properties.Settings.Default.ipAddress;
+            txt_Port.Text = Properties.Settings.Default.port;
+            txt_SlaveId.Text = Properties.Settings.Default.slaveId;
         }
 
         /// <summary>
@@ -39,6 +42,9 @@ namespace ModbusSlave
                 _modbusConnection.Connect(ipAddress, port, slaveId);
                 _form1.IsConnected = true;
                 _form1.LogMessage = $"{currentTime} connected slaveId - {slaveId} {ipAddress} {port}";
+                Properties.Settings.Default.ipAddress = ipAddress;
+                Properties.Settings.Default.port = port.ToString();
+                Properties.Settings.Default.slaveId = slaveId.ToString();
 
                 this.Close();
             }
