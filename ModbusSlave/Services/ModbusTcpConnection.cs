@@ -63,7 +63,7 @@ namespace ModbusSlave.Services
         {
             if (_slave == null)
             {
-                throw new InvalidOperationException("ModbusMaster is not connected.");
+                MessageBox.Show("No Connection. Please connect first");
             }
 
             // 기존 데이터 읽기 로직
