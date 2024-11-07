@@ -580,7 +580,5 @@ namespace ModbusSlave
                 e.Handled = true;
             }
         }
-
-
     }
 }
