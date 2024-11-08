@@ -40,7 +40,8 @@ namespace ModbusSlave
             try
             {
                 _modbusConnection.Connect(ipAddress, port, slaveId);
-                _form1.IsConnected = true;
+                _form1.IsConnected = false;
+                _form1.IsListened = true;
                 _form1.LogMessage = $"{currentTime} connected slaveId - {slaveId} {ipAddress} {port}";
                 Properties.Settings.Default.ipAddress = ipAddress;
                 Properties.Settings.Default.port = port.ToString();
@@ -51,6 +52,7 @@ namespace ModbusSlave
             catch (Exception ex)
             {
                 _form1.IsConnected = false;
+                _form1.IsListened = false;
                 _form1.LogMessage = $"{currentTime} Slave Connection Failed. {ipAddress}:{port}";
             }
         }

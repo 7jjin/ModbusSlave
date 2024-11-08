@@ -56,6 +56,8 @@
             this.tslbl_status = new System.Windows.Forms.ToolStripStatusLabel();
             this.stlbl_statusCircle = new System.Windows.Forms.ToolStripStatusLabel();
             this.tslbl_conectText = new System.Windows.Forms.ToolStripStatusLabel();
+            this.stlbl_listenCircle = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tslbl_listenText = new System.Windows.Forms.ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)(this.dataView)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -110,7 +112,7 @@
             this.dataView.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.dataView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataView.ShowCellToolTips = false;
-            this.dataView.Size = new System.Drawing.Size(488, 363);
+            this.dataView.Size = new System.Drawing.Size(600, 363);
             this.dataView.TabIndex = 25;
             // 
             // tableLayoutPanel1
@@ -130,7 +132,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 57.38994F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 36.79245F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5.974843F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(488, 663);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(600, 663);
             this.tableLayoutPanel1.TabIndex = 47;
             // 
             // panel1
@@ -139,7 +141,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(482, 23);
+            this.panel1.Size = new System.Drawing.Size(594, 23);
             this.panel1.TabIndex = 0;
             // 
             // menuStrip1
@@ -154,7 +156,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(0);
-            this.menuStrip1.Size = new System.Drawing.Size(482, 23);
+            this.menuStrip1.Size = new System.Drawing.Size(594, 23);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -211,7 +213,7 @@
             this.panel2.Location = new System.Drawing.Point(0, 29);
             this.panel2.Margin = new System.Windows.Forms.Padding(0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(488, 363);
+            this.panel2.Size = new System.Drawing.Size(600, 363);
             this.panel2.TabIndex = 1;
             // 
             // panel3
@@ -220,7 +222,7 @@
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel3.Location = new System.Drawing.Point(3, 395);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(482, 226);
+            this.panel3.Size = new System.Drawing.Size(594, 226);
             this.panel3.TabIndex = 2;
             // 
             // gbx_readTest
@@ -232,7 +234,7 @@
             this.gbx_readTest.Controls.Add(this.btnReadData);
             this.gbx_readTest.Controls.Add(this.label2);
             this.gbx_readTest.Controls.Add(this.lbl_ReadAddress);
-            this.gbx_readTest.Location = new System.Drawing.Point(19, 16);
+            this.gbx_readTest.Location = new System.Drawing.Point(80, 13);
             this.gbx_readTest.Name = "gbx_readTest";
             this.gbx_readTest.Size = new System.Drawing.Size(444, 191);
             this.gbx_readTest.TabIndex = 0;
@@ -308,7 +310,7 @@
             this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel4.Location = new System.Drawing.Point(3, 627);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(482, 33);
+            this.panel4.Size = new System.Drawing.Size(594, 33);
             this.panel4.TabIndex = 3;
             // 
             // statusStrip1
@@ -319,10 +321,12 @@
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tslbl_status,
             this.stlbl_statusCircle,
-            this.tslbl_conectText});
+            this.tslbl_conectText,
+            this.stlbl_listenCircle,
+            this.tslbl_listenText});
             this.statusStrip1.Location = new System.Drawing.Point(0, 0);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(482, 33);
+            this.statusStrip1.Size = new System.Drawing.Size(594, 33);
             this.statusStrip1.TabIndex = 0;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -354,11 +358,29 @@
             this.tslbl_conectText.Size = new System.Drawing.Size(88, 27);
             this.tslbl_conectText.Text = "Disconnected";
             // 
+            // stlbl_listenCircle
+            // 
+            this.stlbl_listenCircle.AutoSize = false;
+            this.stlbl_listenCircle.BackColor = System.Drawing.Color.Transparent;
+            this.stlbl_listenCircle.Font = new System.Drawing.Font("맑은 고딕", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.stlbl_listenCircle.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.stlbl_listenCircle.Margin = new System.Windows.Forms.Padding(5, 6, 0, 6);
+            this.stlbl_listenCircle.Name = "stlbl_listenCircle";
+            this.stlbl_listenCircle.Size = new System.Drawing.Size(16, 21);
+            this.stlbl_listenCircle.Text = "      ";
+            // 
+            // tslbl_listenText
+            // 
+            this.tslbl_listenText.Margin = new System.Windows.Forms.Padding(6, 4, 0, 2);
+            this.tslbl_listenText.Name = "tslbl_listenText";
+            this.tslbl_listenText.Size = new System.Drawing.Size(84, 27);
+            this.tslbl_listenText.Text = "Not Listened";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(488, 663);
+            this.ClientSize = new System.Drawing.Size(600, 663);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -406,6 +428,8 @@
         private System.Windows.Forms.ToolStripStatusLabel tslbl_status;
         private System.Windows.Forms.ToolStripStatusLabel stlbl_statusCircle;
         private System.Windows.Forms.ToolStripStatusLabel tslbl_conectText;
+        private System.Windows.Forms.ToolStripStatusLabel stlbl_listenCircle;
+        private System.Windows.Forms.ToolStripStatusLabel tslbl_listenText;
     }
 }
 

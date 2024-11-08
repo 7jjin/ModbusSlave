@@ -3,12 +3,10 @@ using NModbus;
 using NModbus.Data;
 using NModbus.Device;
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 
 namespace ModbusSlave.Services
@@ -19,35 +17,42 @@ namespace ModbusSlave.Services
         private IModbusSlaveNetwork _slaveNetwork;
         private IModbusSlave _slave;
         private DefaultSlaveDataStore _dataStore;
-        private DataGridView _dataView;
-        private TcpClient _tcpClient;
+        private System.Timers.Timer _connectionTimer;
+        private bool _isConnected = false;
+        private TcpClient _masterClient;
 
-        public ModbusTcpConnection(){}
+        public ModbusTcpConnection()
+        {
+            _connectionTimer = new System.Timers.Timer(2000);
+            _connectionTimer.Elapsed += CheckConnectionStatus;
+            _connectionTimer.AutoReset = true;
+        }
 
         /// <summary>
         /// Connect 함수 - Slave 연결 설정
         /// </summary>
-        public void Connect(string ipAddress, int port, int slaveId)
+        public async void Connect(string ipAddress, int port, int slaveId)
         {
             try
             {
-                _tcpListener = new TcpListener(System.Net.IPAddress.Parse(ipAddress), port);
+                _tcpListener = new TcpListener(IPAddress.Parse(ipAddress), port);
                 _tcpListener.Start();
                 var factory = new ModbusFactory();
 
-                // 기본 데이터 저장소 생성 (Coils, Inputs, Holding Registers, Input Registers)
+                // 기본 데이터 저장소 생성
                 _dataStore = new DefaultSlaveDataStore();
-
-                // Slave 생성 및 네트워크 설정
                 _slave = factory.CreateSlave((byte)slaveId, _dataStore);
                 _slaveNetwork = factory.CreateSlaveNetwork(_tcpListener);
                 _slaveNetwork.AddSlave(_slave);
 
-                // 비동기적으로 요청을 처리하도록 설정
-                Task.Run(async () => await _slaveNetwork.ListenAsync());
+                Console.WriteLine("Modbus Slave is listening for connections.");
 
-                // Slave 연결 시작
-                Console.WriteLine("Modbus Slave connected successfully.");
+                // Master 연결 수락 대기 (비동기적)
+                _masterClient = await _tcpListener.AcceptTcpClientAsync();
+                Console.WriteLine("modbus Connect?" , _masterClient.Connected);
+                _connectionTimer.Start(); // 연결 성공 후 타이머 시작
+
+                Console.WriteLine("Modbus Master connected.");
             }
             catch (Exception ex)
             {
@@ -62,18 +67,24 @@ namespace ModbusSlave.Services
         {
             try
             {
+                _connectionTimer.Stop();
 
-                // TcpListener 중지 - 연결된 클라이언트가 연결 끊김을 감지하게 됨
                 if (_tcpListener != null)
                 {
-                    _tcpListener.Server.Close();
+                    _tcpListener.Stop();
                     _tcpListener = null;
                 }
 
-                // SlaveNetwork와 Slave 리소스 정리
+                if (_masterClient != null)
+                {
+                    _masterClient.Close();
+                    _masterClient = null;
+                }
+
                 _slaveNetwork.Dispose();
                 _slave = null;
 
+                _isConnected = false;
                 MessageBox.Show("Slave disconnected successfully.");
             }
             catch (Exception ex)
@@ -82,32 +93,63 @@ namespace ModbusSlave.Services
             }
         }
 
+        /// <summary>
+        /// Master와의 연결 상태를 주기적으로 확인하는 메서드
+        /// </summary>
+        private void CheckConnectionStatus(object sender, ElapsedEventArgs e)
+        {
+            if (!IsMasterConnected())
+            {
+                Console.WriteLine("Connection lost. Attempting to reconnect...");
+                _isConnected = false;
+                _connectionTimer.Stop(); // 재연결 시도 중 타이머 일시 정지
+            }
+        }
 
-        // 특정 Holding Register 값 업데이트
+        /// <summary>
+        /// Master와의 소켓 연결 상태 확인
+        /// </summary>
+        public bool IsMasterConnected()
+        {
+            try
+            {
+                // Master와 연결된 클라이언트 소켓의 상태를 확인
+                if (_masterClient?.Client != null &&
+                    _masterClient.Client.Poll(0, SelectMode.SelectRead) &&
+                    _masterClient.Client.Available == 0)
+                {
+                    return false; // 연결 끊김
+                }
+                return true; // 연결 유지 중
+            }
+            catch
+            {
+                return false; // 소켓 상태 확인 불가, 연결 끊김으로 간주
+            }
+        }
+
         public async Task<ushort[]> ReadHoldingRegistersAsync(ushort startAddress, ushort quantity)
         {
-            if (_slave == null)
+            if (!_isConnected)
             {
-                MessageBox.Show("ModbusMaster is not connected.");
+                MessageBox.Show("Modbus Master is not connected.");
                 return null;
             }
             else
             {
-                // 기존 데이터 읽기 로직
                 return await Task.FromResult(_dataStore.HoldingRegisters.ReadPoints(startAddress, quantity));
             }
         }
 
         public async Task WriteHoldingRegistersAsync(ushort startAddress, ushort[] values)
         {
-            if (_slave == null)
+            if (!_isConnected)
             {
-                MessageBox.Show("ModbusMaster is not connected.");
+                MessageBox.Show("Modbus Master is not connected.");
                 return;
             }
             else
             {
-                // 값들을 Holding Register에 쓰기
                 await Task.Run(() => _dataStore.HoldingRegisters.WritePoints(startAddress, values));
             }
         }
