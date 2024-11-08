@@ -110,7 +110,7 @@
             this.dataView.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.dataView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataView.ShowCellToolTips = false;
-            this.dataView.Size = new System.Drawing.Size(486, 363);
+            this.dataView.Size = new System.Drawing.Size(488, 363);
             this.dataView.TabIndex = 25;
             // 
             // tableLayoutPanel1
@@ -130,7 +130,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 57.38994F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 36.79245F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5.974843F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(486, 663);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(488, 663);
             this.tableLayoutPanel1.TabIndex = 47;
             // 
             // panel1
@@ -139,7 +139,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(480, 23);
+            this.panel1.Size = new System.Drawing.Size(482, 23);
             this.panel1.TabIndex = 0;
             // 
             // menuStrip1
@@ -154,7 +154,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(0);
-            this.menuStrip1.Size = new System.Drawing.Size(480, 23);
+            this.menuStrip1.Size = new System.Drawing.Size(482, 23);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -211,7 +211,7 @@
             this.panel2.Location = new System.Drawing.Point(0, 29);
             this.panel2.Margin = new System.Windows.Forms.Padding(0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(486, 363);
+            this.panel2.Size = new System.Drawing.Size(488, 363);
             this.panel2.TabIndex = 1;
             // 
             // panel3
@@ -220,7 +220,7 @@
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel3.Location = new System.Drawing.Point(3, 395);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(480, 226);
+            this.panel3.Size = new System.Drawing.Size(482, 226);
             this.panel3.TabIndex = 2;
             // 
             // gbx_readTest
@@ -232,7 +232,7 @@
             this.gbx_readTest.Controls.Add(this.btnReadData);
             this.gbx_readTest.Controls.Add(this.label2);
             this.gbx_readTest.Controls.Add(this.lbl_ReadAddress);
-            this.gbx_readTest.Location = new System.Drawing.Point(18, 15);
+            this.gbx_readTest.Location = new System.Drawing.Point(19, 16);
             this.gbx_readTest.Name = "gbx_readTest";
             this.gbx_readTest.Size = new System.Drawing.Size(444, 191);
             this.gbx_readTest.TabIndex = 0;
@@ -308,7 +308,7 @@
             this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel4.Location = new System.Drawing.Point(3, 627);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(480, 33);
+            this.panel4.Size = new System.Drawing.Size(482, 33);
             this.panel4.TabIndex = 3;
             // 
             // statusStrip1
@@ -322,7 +322,7 @@
             this.tslbl_conectText});
             this.statusStrip1.Location = new System.Drawing.Point(0, 0);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(480, 33);
+            this.statusStrip1.Size = new System.Drawing.Size(482, 33);
             this.statusStrip1.TabIndex = 0;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -358,7 +358,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(486, 663);
+            this.ClientSize = new System.Drawing.Size(488, 663);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

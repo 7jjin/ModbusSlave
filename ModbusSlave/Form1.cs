@@ -28,8 +28,18 @@ namespace ModbusSlave
                 stlbl_statusCircle.Invalidate();  // 상태 라벨 다시 그리기
             }
         }
+        //public bool IsListened
+        //{
+        //    get => _isListened;
+        //    set
+        //    {
+        //        _isListened = value;
+        //        stlbl_listenCircle.Invalidate();
+        //    }
+        //}
         private string _logMessage;
         private bool _isConnected;
+        // private bool _isListened;
         public Form1(IModbusConnection modbusConnection, IDataViewService dataViewService, IContextMenuService contextMenuService)
         {
             InitializeComponent();
