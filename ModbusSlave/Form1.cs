@@ -10,6 +10,8 @@ namespace ModbusSlave
         private IModbusConnection _modbusConnection;
         private readonly IDataViewService _dataViewService;
         private readonly IContextMenuService _contextMenuService;
+        private Timer _statusUpdateTimer;
+
         public string LogMessage
         {
             get => _logMessage;
@@ -19,6 +21,7 @@ namespace ModbusSlave
                 tslbl_status.Invalidate();
             }
         }
+
         public bool IsConnected
         {
             get => _isConnected;
@@ -28,6 +31,7 @@ namespace ModbusSlave
                 stlbl_statusCircle.Invalidate();  // 상태 라벨 다시 그리기
             }
         }
+
         public bool IsListened
         {
             get => _isListened;
@@ -37,34 +41,46 @@ namespace ModbusSlave
                 stlbl_listenCircle.Invalidate();
             }
         }
+
         private string _logMessage;
         private bool _isConnected;
         private bool _isListened;
         public Form1(IModbusConnection modbusConnection, IDataViewService dataViewService, IContextMenuService contextMenuService)
         {
             InitializeComponent();
-            
+
             _modbusConnection = modbusConnection;
             _dataViewService = dataViewService;
             _contextMenuService = contextMenuService;
 
-            
             dataView.MouseDown += DataView_MouseDown;
             txt_ReadAddress.TextChanged += Txt_ReadAddress_TextChanged;
             stlbl_statusCircle.Paint += StatusLabel_Paint;
             stlbl_listenCircle.Paint += Listened_abel_Paint;
+
+            // Timer 설정 (1초마다 상태 체크)
+            _statusUpdateTimer = new Timer();
+            _statusUpdateTimer.Interval = 1000;  // 1초마다 체크
+            _statusUpdateTimer.Tick += async (sender, e) =>
+            {
+                bool isMasterConnected = await _modbusConnection.IsMasterConnected();
+                IsConnected = isMasterConnected;  // IsConnected 값을 업데이트
+                                                  // 상태 표시 원의 색을 업데이트
+                stlbl_statusCircle.Invalidate();
+            };
+            _statusUpdateTimer.Start();
         }
 
 
         private void Form1_Load(object sender, EventArgs e)
         {
-           
             _dataViewService.InitializeDataView(dataView);
             _dataViewService.LoadData(dataView);
 
             txt_ReadAddress.Text = "0";
             txt_ReadQuantity.Text = "10";
             IsConnected = false;
+            IsListened = false;
             tslbl_conectText.Text = "Disconnected";
             LogMessage = "No connection";
 
@@ -78,66 +94,50 @@ namespace ModbusSlave
         /// <param name="e"></param>
         private void StatusLabel_Paint(object sender, PaintEventArgs e)
         {
-            Color color = new Color();
-            string currentTime = DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]");
+            Color color;
 
+            // Listen 상태지만 Master와 연결되지 않은 경우
             if (IsListened)
             {
-                if (_modbusConnection.IsMasterConnected() == false)
+                if (IsConnected)
+                {
+                    Console.WriteLine("Master와 연결되었습니다.");
+                    color = Color.Green;
+                    tslbl_conectText.Text = "Connected";
+                    tslbl_status.Text = LogMessage ?? "Connected";
+                }
+                else
                 {
                     Console.WriteLine("Master와의 연결이 해제되었습니다.");
                     color = Color.Red;
                     tslbl_conectText.Text = "Disconnected";
-                    tslbl_status.Text = LogMessage ?? "No connection";
-                }
-                else if(_modbusConnection.IsMasterConnected() == true)
-                {
-                    Console.WriteLine("연결을 성공했습니다.");
-                    color = Color.Green;
-                    tslbl_conectText.Text = "Connected";
-                    tslbl_status.Text = LogMessage;
+                    tslbl_status.Text = "No connection";
                 }
             }
-            else
+            else // Listen 상태가 아닐 때
             {
                 color = Color.Red;
                 tslbl_conectText.Text = "Disconnected";
                 tslbl_status.Text = "No connection";
             }
 
-
             using (SolidBrush brush = new SolidBrush(color))
             {
-                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias; // 부드럽게 원 그리기
-                e.Graphics.FillEllipse(brush, 0, 0, stlbl_statusCircle.Width - 1, stlbl_statusCircle.Height - 1); // 원 그리기
+                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                e.Graphics.FillEllipse(brush, 0, 0, stlbl_statusCircle.Width - 1, stlbl_statusCircle.Height - 1);
             }
-
         }
 
         private void Listened_abel_Paint(object sender, PaintEventArgs e)
         {
-            Color color = new Color();
-            string currentTime = DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]");
-
-            // slave 연결이 되었을 때
-            if (IsListened)
-            {
-                tslbl_listenText.Text = "Listened";
-                color = Color.Green;
-            }
-            // slave 연결이 해제 되었을 때
-            else
-            {
-                tslbl_listenText.Text = "Not Listened";
-                color = Color.Red;
-            }
+            Color color = IsListened ? Color.Green : Color.Red;
+            tslbl_listenText.Text = IsListened ? "Listened" : "Not Listened";
 
             using (SolidBrush brush = new SolidBrush(color))
             {
-                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias; // 부드럽게 원 그리기
-                e.Graphics.FillEllipse(brush, 0, 0, stlbl_statusCircle.Width - 1, stlbl_statusCircle.Height - 1); // 원 그리기
+                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                e.Graphics.FillEllipse(brush, 0, 0, stlbl_listenCircle.Width - 1, stlbl_listenCircle.Height - 1);
             }
-
         }
 
         /// <summary>
@@ -246,8 +246,19 @@ namespace ModbusSlave
 
         private void connectToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ConnectionForm connectionForm = new ConnectionForm(_modbusConnection, this);
-            connectionForm.ShowDialog();
+            try
+            {
+                ConnectionForm connectionForm = new ConnectionForm(_modbusConnection, this);
+                connectionForm.ShowDialog();
+                _modbusConnection.IsMasterConnected();
+                IsListened = true;
+                LogMessage = "Slave is now listening for connections...";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to start listening: {ex.Message}");
+                LogMessage = "Failed to listen";
+            }
         }
 
         private void disconnectToolStripMenuItem_Click(object sender, EventArgs e)

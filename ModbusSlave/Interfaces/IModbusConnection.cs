@@ -9,11 +9,12 @@ namespace ModbusSlave.Interfaces
 {
     public interface IModbusConnection
     {
+
         void Connect(string ipAddress, int port, int slaveId);
 
         void Disconnect();
 
-        bool IsMasterConnected();
+        Task<bool> IsMasterConnected();
         Task<ushort[]> ReadHoldingRegistersAsync(ushort startAddress, ushort quantity);
         Task WriteHoldingRegistersAsync(ushort startAddress, ushort[] values);
     }
