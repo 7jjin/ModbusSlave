@@ -61,7 +61,7 @@ namespace ModbusSlave.Services
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error connecting: {ex.Message}");
+                //MessageBox.Show($"Error connecting: {ex.Message}");
             }
         }
 
@@ -84,13 +84,14 @@ namespace ModbusSlave.Services
                 {
                     _masterClient.Close();
                     _masterClient = null;
+
                 }
 
                 _slaveNetwork.Dispose();
                 _slave = null;
 
                 _isConnected = false;
-                MessageBox.Show("Slave disconnected successfully.");
+               // MessageBox.Show("Slave disconnected successfully.");
             }
             catch (Exception ex)
             {

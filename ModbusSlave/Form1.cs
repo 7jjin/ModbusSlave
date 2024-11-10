@@ -265,6 +265,7 @@ namespace ModbusSlave
         {
             _modbusConnection.Disconnect();
             IsConnected = false;
+            IsListened= false;
             LogMessage = "No connection";
         }
 
