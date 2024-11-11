@@ -385,7 +385,7 @@
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Modbus Slave";
-            this.Load += new System.EventHandler(this.Form1_Load);
+
             ((System.ComponentModel.ISupportInitialize)(this.dataView)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
