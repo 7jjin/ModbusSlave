@@ -1,7 +1,10 @@
 ﻿using ModbusSlave.Interfaces;
 using System;
 using System.Drawing;
+using System.Threading;
 using System.Windows.Forms;
+using Timer = System.Windows.Forms.Timer;
+
 
 namespace ModbusSlave
 {
@@ -12,40 +15,7 @@ namespace ModbusSlave
         private readonly IContextMenuService _contextMenuService;
         private Timer _statusUpdateTimer;
 
-        public string LogMessage
-        {
-            get => _logMessage;
-            set
-            {
-                _logMessage = value;
-                tslbl_status.Invalidate();
-            }
-        }
-
-        public bool IsConnected
-        {
-            get => _isConnected;
-            set
-            {
-                _isConnected = value;
-                stlbl_statusCircle.Invalidate();
-            }
-        }
-
-        public bool IsListened
-        {
-            get => _isListened;
-            set
-            {
-                _isListened = value;
-                stlbl_listenCircle.Invalidate();
-            }
-        }
-
-        private string _logMessage;
-        private bool _isConnected;
-        private bool _isListened;
-
+       
         public Form1(IModbusConnection modbusConnection, IDataViewService dataViewService, IContextMenuService contextMenuService)
         {
             InitializeComponent();
@@ -74,23 +44,25 @@ namespace ModbusSlave
             _statusUpdateTimer = new Timer { Interval = 1000 }; // 1초마다 체크
             _statusUpdateTimer.Tick += async (sender, e) =>
             {
-                IsConnected = await _modbusConnection.IsMasterConnected();
-                Console.WriteLine($"isConnected {IsConnected}");
+                _modbusConnection.IsConnected = await _modbusConnection.IsMasterConnected();
+                Console.WriteLine($"isConnected {_modbusConnection.IsConnected}");
+                stlbl_statusCircle.Invalidate(); // 상태 원이 다시 그려지도록 트리거
+                stlbl_listenCircle.Invalidate(); // 상태 원이 다시 그려지도록 트리거
             };
             _statusUpdateTimer.Start();
         }
 
         private void StatusLabel_Paint(object sender, PaintEventArgs e)
         {
-            PaintStatusCircle(e, stlbl_statusCircle, IsListened && IsConnected ? Color.Green : Color.Red);
-            tslbl_conectText.Text = IsConnected ? "Connected" : "Disconnected";
-            tslbl_status.Text = LogMessage ?? "No connection";
+            PaintStatusCircle(e, stlbl_statusCircle, _modbusConnection.IsListened && _modbusConnection.IsConnected ? Color.Green : Color.Red);
+            tslbl_conectText.Text = _modbusConnection.IsConnected ? "Connected" : "Disconnected";
+            tslbl_status.Text = _modbusConnection.LogMessage ?? "No connection";
         }
 
         private void ListenLabel_Paint(object sender, PaintEventArgs e)
         {
-            PaintStatusCircle(e, stlbl_listenCircle, IsListened ? Color.Green : Color.Red);
-            tslbl_listenText.Text = IsListened ? "Listened" : "Not Listened";
+            PaintStatusCircle(e, stlbl_listenCircle, _modbusConnection.IsListened ? Color.Green : Color.Red);
+            tslbl_listenText.Text = _modbusConnection.IsListened ? "Listened" : "Not Listened";
         }
 
         private void PaintStatusCircle(PaintEventArgs e, ToolStripLabel control, Color color)
@@ -134,8 +106,11 @@ namespace ModbusSlave
             {
                 ushort startAddress = GetAddressValue(txt_ReadAddress);
                 ushort quantity = GetAddressValue(txt_ReadQuantity);
-                ushort[] holdingRegisters = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, quantity);
+                var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10)); // 5초 타임아웃
 
+                Console.WriteLine("Reading Holding Register...");
+                ushort[] holdingRegisters = await _modbusConnection.ReadHoldingRegistersAsync(startAddress, quantity);
+                Console.WriteLine($"Holding registers: {holdingRegisters}");
                 if (holdingRegisters != null)
                 {
                     for (int i = 0; i < holdingRegisters.Length; i++)
@@ -143,14 +118,14 @@ namespace ModbusSlave
                         dataView.Rows[i].Cells[1].Value = ((short)holdingRegisters[i]).ToString();
                     }
                     _dataViewService.SetCellsToSigned(holdingRegisters.Length - 1);
-                    LogMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Read {40001 + startAddress} ~ {40001 + startAddress + quantity} data ";
+                    _modbusConnection.LogMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Read {40001 + startAddress} ~ {40001 + startAddress + quantity} data ";
                     statusStrip1.Refresh();
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to read data: {ex.Message}");
-                LogMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Failed to read data";
+                _modbusConnection.LogMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Failed to read data";
             }
         }
 
@@ -167,14 +142,14 @@ namespace ModbusSlave
             try
             {
                 connectionForm.ShowDialog();
-                _modbusConnection.IsMasterConnected();
-                IsListened = true;
-                LogMessage = "Slave is now listening for connections...";
+                //_modbusConnection.IsMasterConnected();
+                //IsListened = true;
+                //LogMessage = "Slave is now listening for connections...";
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to start listening: {ex.Message}");
-                LogMessage = "Failed to listen";
+                _modbusConnection.LogMessage = "Failed to listen";
             }
             finally
             {
@@ -186,9 +161,9 @@ namespace ModbusSlave
         private void disconnectToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _modbusConnection.Disconnect();
-            IsConnected = false;
-            IsListened = false;
-            LogMessage = "No connection";
+            _modbusConnection.IsConnected = false;
+            _modbusConnection.IsListened = false;
+            _modbusConnection.LogMessage = "No connection";
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)

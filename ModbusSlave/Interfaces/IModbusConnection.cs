@@ -10,8 +10,9 @@ namespace ModbusSlave.Interfaces
     public interface IModbusConnection
     {
         Task<bool> IsMasterConnected();  // 기존 연결 확인 메서드
-        bool IsConnected { get; }        // 연결 상태를 반환하는 속성
-        bool IsListening { get; }        // Listen 상태를 반환하는 속성
+        bool IsConnected { get; set; }        // 연결 상태를 반환하는 속성
+        bool IsListened { get; set; }        // Listen 상태를 반환하는 속성
+        string LogMessage { get; set; }
         void Connect(string ipAddress, int port, int slaveId);
 
         void Disconnect();
